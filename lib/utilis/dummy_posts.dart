@@ -30,7 +30,7 @@ class PostData {
 }
 
 class Posts with ChangeNotifier {
-  List<PostData> _dummyPosts = [
+  final List<PostData> _dummyPosts = [
     PostData(
       postId: '1',
       name: 'John Doe',

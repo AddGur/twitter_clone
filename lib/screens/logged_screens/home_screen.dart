@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:twitter_clone/screens/logged_screens/new_post_screen.dart';
-import 'package:twitter_clone/screens/logged_screens/selected_image_screen.dart';
+
+import '../logged_screens/new_post_screen.dart';
+import '../logged_screens/selected_image_screen.dart';
 import 'package:twitter_clone/utilis/dummy_posts.dart';
 import 'package:twitter_clone/widgets/drawer.dart';
 import 'package:twitter_clone/widgets/post_widget.dart';
@@ -38,16 +38,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Builder(builder: (context) {
                   return GestureDetector(
                     onTap: () => Scaffold.of(context).openDrawer(),
-                    child: CircleAvatar(
+                    child: const CircleAvatar(
                       backgroundColor: Colors.red,
                       child: Text('A'),
                     ),
                   );
                 }),
               ),
-              actions: [
+              actions: const [
                 Padding(
-                  padding: const EdgeInsets.only(right: 10),
+                  padding: EdgeInsets.only(right: 10),
                   child: Icon(
                     Icons.star_outline,
                     color: Colors.black,
@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        drawer: TwitterDrawer(),
+        drawer: const TwitterDrawer(),
         floatingActionButton: SpeedDial(
           buttonSize: const Size(50.0, 50.0),
           animatedIcon: AnimatedIcons.menu_close,
@@ -81,16 +81,16 @@ class _HomeScreenState extends State<HomeScreen> {
           onClose: () => Navigator.pushNamed(context, NewPostScreen.routeName),
           children: [
             SpeedDialChild(
-              child: Icon(FontAwesomeIcons.gift),
-              labelWidget: Text('GIF   '),
+              child: const Icon(FontAwesomeIcons.gift),
+              labelWidget: const Text('GIF   '),
             ),
             SpeedDialChild(
-              child: Icon(Icons.mail),
-              labelWidget: Text('Photos   '),
+              child: const Icon(Icons.mail),
+              labelWidget: const Text('Photos   '),
             ),
             SpeedDialChild(
-              child: Icon(Icons.mail),
-              labelWidget: Text('Spaces   '),
+              child: const Icon(Icons.mail),
+              labelWidget: const Text('Spaces   '),
             ),
           ],
         ));

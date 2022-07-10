@@ -16,14 +16,14 @@ class TwitterButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
       child: Text(
         buttonsText,
         style: TextStyle(color: textColor),
       ),
-      style: ElevatedButton.styleFrom(
-          primary: backgroundColor,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
     );
   }
 }

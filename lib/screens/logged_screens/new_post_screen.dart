@@ -4,7 +4,6 @@ import 'dart:developer' as devtools show log;
 import 'dart:io';
 
 import 'package:provider/provider.dart';
-import 'package:twitter_clone/utilis/dummy_posts.dart';
 
 class NewPostScreen extends StatefulWidget {
   static const routeName = '/newPostScreen';
@@ -16,10 +15,9 @@ class NewPostScreen extends StatefulWidget {
 
 class _NewPostScreenState extends State<NewPostScreen> {
   late TextEditingController _commentsController;
-  bool commentIsEmpty = true;
 
   final ImagePicker _picker = ImagePicker();
-  List<XFile>? _imageFileList = [];
+  final List<XFile> _imageFileList = [];
 
   @override
   void initState() {
@@ -39,12 +37,12 @@ class _NewPostScreenState extends State<NewPostScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(35),
+        preferredSize: const Size.fromHeight(35),
         child: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.close,
               color: Colors.black,
             ),
@@ -53,8 +51,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
           actions: [
             isCommentEmpty.commentIsEmpty
                 ? Container()
-                : TextButton(onPressed: () {}, child: Text('Draft')),
-            SizedBox(
+                : TextButton(onPressed: () {}, child: const Text('Draft')),
+            const SizedBox(
               width: 10,
             ),
             ElevatedButton(
@@ -63,16 +61,16 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     ? devtools.log(_commentsController.text)
                     : null;
               },
-              child: Text('Tweet'),
+              child: const Text('Tweet'),
               style: ElevatedButton.styleFrom(
-                  primary: isCommentEmpty.commentIsEmpty
+                  backgroundColor: isCommentEmpty.commentIsEmpty
                       ? Theme.of(context).primaryColor
                       : Colors.blue[100],
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20))),
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
           ],
@@ -85,14 +83,14 @@ class _NewPostScreenState extends State<NewPostScreen> {
             Expanded(
               child:
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
+                const Padding(
+                  padding: EdgeInsets.only(top: 8),
                   child: CircleAvatar(
                     radius: 15,
                     backgroundColor: Colors.red,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 20,
                 ),
                 Expanded(
@@ -110,7 +108,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                         autofocus: true,
                         maxLines: null,
                         decoration: InputDecoration(
-                          hintText: _imageFileList!.length == 0
+                          hintText: _imageFileList.isEmpty
                               ? 'What\'s happening?'
                               : 'Add a comment...',
                           border: InputBorder.none,
@@ -118,22 +116,22 @@ class _NewPostScreenState extends State<NewPostScreen> {
                       ),
                       Expanded(
                         child: Container(
-                          child: _imageFileList!.length == 0
+                          child: _imageFileList.isEmpty
                               ? null
                               : ListView.builder(
                                   scrollDirection: Axis.horizontal,
                                   itemBuilder: (context, index) {
                                     return Padding(
-                                      padding: EdgeInsets.all(20),
+                                      padding: const EdgeInsets.all(20),
                                       child: Stack(
                                         children: [
                                           ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(20),
                                             child: Image.file(
-                                              File(_imageFileList![index].path),
+                                              File(_imageFileList[index].path),
                                               fit: BoxFit.cover,
-                                              height: _imageFileList!.length > 1
+                                              height: _imageFileList.length > 1
                                                   ? 200
                                                   : 300,
                                             ),
@@ -147,7 +145,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                                                 child: IconButton(
                                                   onPressed: () =>
                                                       removeImage(index),
-                                                  icon: Icon(Icons.delete,
+                                                  icon: const Icon(Icons.delete,
                                                       color: Colors.white),
                                                 ),
                                               )),
@@ -155,7 +153,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                                       ),
                                     );
                                   },
-                                  itemCount: _imageFileList!.length,
+                                  itemCount: _imageFileList.length,
                                 ),
                         ),
                       ),
@@ -165,13 +163,13 @@ class _NewPostScreenState extends State<NewPostScreen> {
               ]),
             ),
             Container(
-              child: _imageFileList!.length == 0
+              child: _imageFileList.isEmpty
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         GestureDetector(
                             onTap: takePicture,
-                            child: ImagePickerWidget(
+                            child: const ImagePickerWidget(
                               iconImage: Icon(
                                 Icons.photo_camera,
                                 color: Colors.blue,
@@ -179,7 +177,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             )),
                         GestureDetector(
                             onTap: selectImages,
-                            child: ImagePickerWidget(
+                            child: const ImagePickerWidget(
                               iconImage: Icon(
                                 Icons.photo_camera_back_outlined,
                                 color: Colors.blue,
@@ -189,30 +187,28 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     )
                   : null,
             ),
-            Divider(),
+            const Divider(),
             GestureDetector(
                 onTap: () {},
-                child: Container(
-                  child: Row(children: [
-                    Icon(
-                      Icons.public,
-                      color: Colors.blue,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      'Everyone can reply',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                  ]),
-                )),
-            Divider(),
+                child: Row(children: [
+                  const Icon(
+                    Icons.public,
+                    color: Colors.blue,
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  const Text(
+                    'Everyone can reply',
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                ])),
+            const Divider(),
             Row(
               children: [
                 IconButton(
                     onPressed: selectImages,
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.image_outlined,
                       color: Colors.blue,
                     )),
@@ -220,7 +216,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     onPressed: () {},
                     icon: Icon(
                       Icons.gif_box_outlined,
-                      color: _imageFileList!.length == 0
+                      color: _imageFileList.isEmpty
                           ? Colors.blue
                           : Colors.blue[200],
                     )),
@@ -228,17 +224,17 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     onPressed: () {},
                     icon: Icon(
                       Icons.graphic_eq_outlined,
-                      color: _imageFileList!.length == 0
+                      color: _imageFileList.isEmpty
                           ? Colors.blue
                           : Colors.blue[200],
                     )),
                 IconButton(
                     onPressed: () {},
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.place_outlined,
                       color: Colors.blue,
                     )),
-                Expanded(child: SizedBox()),
+                const Expanded(child: SizedBox()),
                 IconButton(
                     onPressed: () {},
                     icon: Icon(
@@ -247,7 +243,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                     )),
                 IconButton(
                     onPressed: () {},
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.add_circle_outlined,
                       color: Colors.blue,
                     )),
@@ -263,10 +259,10 @@ class _NewPostScreenState extends State<NewPostScreen> {
     final List<XFile>? selectedImages = await _picker.pickMultiImage();
     if (selectedImages!.isNotEmpty) {
       setState(() {
-        _imageFileList!.addAll(selectedImages);
+        _imageFileList.addAll(selectedImages);
       });
     }
-    devtools.log(_imageFileList!.length.toString());
+    devtools.log(_imageFileList.length.toString());
   }
 
   void takePicture() async {
@@ -276,13 +272,13 @@ class _NewPostScreenState extends State<NewPostScreen> {
       return;
     }
     setState(() {
-      _imageFileList!.add(takenPicture);
+      _imageFileList.add(takenPicture);
     });
   }
 
   void removeImage(int number) {
     setState(() {
-      _imageFileList!.removeAt(number);
+      _imageFileList.removeAt(number);
     });
   }
 }
@@ -297,10 +293,10 @@ class ImagePickerWidget extends StatelessWidget {
       child: Container(
         height: 80,
         width: 80,
-        child: iconImage,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(25),
             border: Border.all(color: Colors.grey)),
+        child: iconImage,
       ),
     );
   }

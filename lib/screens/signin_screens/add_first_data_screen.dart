@@ -1,35 +1,40 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import 'package:intl/intl.dart';
-import 'package:twitter_clone/widgets/twitter_button.dart';
-import 'package:twitter_clone/screens/main_screen.dart';
-import 'package:intl/date_symbol_data_file.dart';
+import 'package:provider/provider.dart';
+import 'package:twitter_clone/screens/signin_screens/add_email_adress_screen.dart';
+import 'package:twitter_clone/screens/signin_screens/add_password_screen.dart';
 
-class NewAccountScreen extends StatefulWidget {
-  static const routeName = '/newAccountScreen';
+import '../../utilis/user.dart';
+import '../../widgets/twitter_button.dart';
+import '../main_screen.dart';
 
-  const NewAccountScreen({super.key});
+import 'dart:developer' as devtools show log;
+
+class AddFirstDataScreen extends StatefulWidget {
+  static const routeName = '/firstData';
+
+  const AddFirstDataScreen({super.key});
 
   @override
-  State<NewAccountScreen> createState() => _NewAccountScreenState();
+  State<AddFirstDataScreen> createState() => _AddFirstDataScreenState();
 }
 
-class _NewAccountScreenState extends State<NewAccountScreen> {
+class _AddFirstDataScreenState extends State<AddFirstDataScreen> {
   late final TextEditingController _nameController;
   late final TextEditingController _numberController;
   late final TextEditingController _emailController;
   late final TextEditingController _birtdayController;
+  late final TextEditingController _passwordController;
   late FocusNode _focus;
 
   int nameLength = 50;
+  int phoneLegth = 9;
   bool _isFocused = false;
   bool _emailChoosen = true;
 
   DateTime birthdayDate = DateTime.now();
-// add locals option
 
   @override
   void initState() {
@@ -37,6 +42,7 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
     _numberController = TextEditingController();
     _emailController = TextEditingController();
     _birtdayController = TextEditingController();
+    _passwordController = TextEditingController();
     _focus = FocusNode();
     super.initState();
   }
@@ -47,6 +53,7 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
     _numberController.dispose();
     _emailController.dispose();
     _birtdayController.dispose();
+    _passwordController.dispose();
     _focus.dispose();
     super.dispose();
   }
@@ -55,6 +62,8 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
     _focus.unfocus();
     setState(() {
       _emailChoosen = !_emailChoosen;
+      _emailChoosen ? _emailController.clear() : _numberController.clear();
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         return _focus.requestFocus();
       });
@@ -67,16 +76,19 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
         initialDate: birthdayDate,
         firstDate: DateTime(1901, 1),
         lastDate: DateTime.now());
-    if (picked != null && picked != birthdayDate)
+    if (picked != null && picked != birthdayDate) {
       setState(() {
         birthdayDate = picked;
         _birtdayController.value = TextEditingValue(
             text: DateFormat('dd MMMM yyyy').format(picked).toString());
       });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final IsNameEmpty isNameEmpty = Provider.of<IsNameEmpty>(context);
+    final userData = Provider.of<NewUser>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -88,7 +100,7 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
           onPressed: () {
             Navigator.of(context).pushNamed(MainLoginScreen.routeName);
           },
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           color: Colors.black,
         ),
       ),
@@ -99,9 +111,9 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
           child: Column(children: [
             Container(
               alignment: Alignment.centerLeft,
-              child: Text(
+              child: const Text(
                 'Create your account',
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700),
               ),
             ),
             TextField(
@@ -111,8 +123,21 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                   _isFocused = false;
                 });
               },
+              textInputAction: TextInputAction.next,
+              onEditingComplete: () {
+                FocusScope.of(context).nextFocus();
+                setState(() {
+                  _isFocused = true;
+                });
+              },
               controller: _nameController,
               decoration: InputDecoration(
+                  suffixIcon: isNameEmpty.isNameEmpty
+                      ? null
+                      : const Icon(
+                          FontAwesomeIcons.circleCheck,
+                          color: Colors.green,
+                        ),
                   hintText: 'Name',
                   counterText: nameLength.toString(),
                   counterStyle: TextStyle(
@@ -120,6 +145,12 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
               onChanged: (value) {
                 setState(() {
                   nameLength = 50 - _nameController.text.length;
+
+                  if (_nameController.text.isEmpty) {
+                    context.read<IsNameEmpty>().setTrue();
+                  } else {
+                    context.read<IsNameEmpty>().setFalse();
+                  }
                 });
               },
             ),
@@ -130,6 +161,14 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                   });
                 },
                 focusNode: _focus,
+                textInputAction: TextInputAction.next,
+                onEditingComplete: () {
+                  FocusScope.of(context).nextFocus();
+                  setState(() {
+                    _isFocused = false;
+                  });
+                  _selectDate(context);
+                },
                 keyboardType:
                     _emailChoosen ? TextInputType.phone : TextInputType.text,
                 decoration: InputDecoration(
@@ -139,22 +178,25 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
                             : 'Email address'
                         : 'Phone number or email address'),
                 controller:
-                    _emailChoosen ? _emailController : _numberController),
+                    _emailChoosen ? _numberController : _emailController),
             GestureDetector(
-              onTap: () => _selectDate(context),
+              onTap: () {
+                _selectDate(context);
+                setState(() {
+                  _isFocused = false;
+                });
+              },
               child: AbsorbPointer(
                 child: TextField(
-                  // Add a datePicker
                   controller: _birtdayController,
-                  keyboardType: TextInputType.datetime,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Date of birth',
                   ),
                 ),
               ),
             ),
-            Expanded(child: SizedBox()),
-            Divider(),
+            const Expanded(child: SizedBox()),
+            const Divider(),
             Row(
               mainAxisAlignment: _isFocused
                   ? MainAxisAlignment.spaceBetween
@@ -162,13 +204,39 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
               children: [
                 _isFocused
                     ? ElevatedButton(
-                        onPressed: () => _switchKeybordType(),
+                        onPressed: () {
+                          _switchKeybordType();
+
+                          _emailChoosen
+                              ? userData.email = ''
+                              : userData.phoneNumber = '';
+                        },
                         child: Text(_emailChoosen
                             ? 'Use email instead'
                             : 'Use phone instead'))
-                    : SizedBox(),
+                    : const SizedBox(),
                 TwitterButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      if (_nameController.text.isNotEmpty &&
+                              _birtdayController.text.isNotEmpty &&
+                              _emailController.text.isNotEmpty ||
+                          _numberController.text.isNotEmpty) {
+                        if (_emailController.text.isNotEmpty) {
+                          userData.setUserEmail(_nameController.text,
+                              _emailController.text, _birtdayController.text);
+
+                          devtools.log(userData.phoneNumber);
+                          Navigator.pushNamed(
+                              context, AddPasswordScreen.routeName);
+                        } else {
+                          userData.setUserPhone(_nameController.text,
+                              _numberController.text, _birtdayController.text);
+
+                          Navigator.pushNamed(
+                              context, AddEmailAdressScreen.routeName);
+                        }
+                      }
+                    },
                     buttonsText: 'Next',
                     textColor: Colors.black,
                     backgroundColor: Colors.white)
@@ -178,5 +246,20 @@ class _NewAccountScreenState extends State<NewAccountScreen> {
         ),
       ),
     );
+  }
+}
+
+class IsNameEmpty with ChangeNotifier {
+  bool _isNameEmpty = true;
+  bool get isNameEmpty => _isNameEmpty;
+
+  void setFalse() {
+    _isNameEmpty = false;
+    notifyListeners();
+  }
+
+  void setTrue() {
+    _isNameEmpty = true;
+    notifyListeners();
   }
 }

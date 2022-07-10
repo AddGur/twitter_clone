@@ -1,8 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
 
 import '../utilis/dummy_posts.dart';
 
@@ -16,7 +13,7 @@ class PostWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: Column(children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,7 +22,7 @@ class PostWidget extends StatelessWidget {
               radius: 30,
               backgroundImage: NetworkImage(postData.userImageUrl),
             ),
-            SizedBox(
+            const SizedBox(
               width: 5,
             ),
             Expanded(
@@ -40,7 +37,7 @@ class PostWidget extends StatelessWidget {
                         children: [
                           Text(
                             postData.name,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
                             postData.alias,
@@ -56,7 +53,7 @@ class PostWidget extends StatelessWidget {
                           ),
                         ],
                       ),
-                      Icon(
+                      const Icon(
                         Icons.list,
                         size: 16,
                       ),
@@ -88,10 +85,10 @@ class PostWidget extends StatelessWidget {
                       CommunityIcon(
                           icon: FontAwesomeIcons.heart,
                           count: postData.shareCounter),
-                      CommunityIcon(
+                      const CommunityIcon(
                         icon: FontAwesomeIcons.share,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 40,
                       )
                     ],
@@ -101,7 +98,7 @@ class PostWidget extends StatelessWidget {
             )
           ],
         ),
-        Divider(),
+        const Divider(),
       ]),
     );
   }
@@ -119,24 +116,23 @@ class CommunityIcon extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: GestureDetector(
         onTap: () {},
-        child: Container(
-            child: Row(
+        child: Row(
           children: [
             Icon(
               icon,
               size: 12,
               color: Colors.grey[700],
             ),
-            SizedBox(
+            const SizedBox(
               width: 3,
             ),
             if (count != null)
               Text(
                 count.toString(),
-                style: TextStyle(fontWeight: FontWeight.w400),
+                style: const TextStyle(fontWeight: FontWeight.w400),
               ),
           ],
-        )),
+        ),
       ),
     );
   }

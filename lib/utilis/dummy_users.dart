@@ -17,8 +17,8 @@ class UserData with ChangeNotifier {
       required this.following});
 }
 
-class Users with ChangeNotifier {
-  List<UserData> _dummyUsers = [
+class RandomUsers with ChangeNotifier {
+  final List<UserData> _dummyUsers = [
     UserData(
         uid: '1',
         userName: 'John Doe',

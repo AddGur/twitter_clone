@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:twitter_clone/responsive/mobile_screen_layout.dart';
-import 'package:twitter_clone/screens/main_screen.dart';
-import 'package:twitter_clone/screens/new_account_screen.dart';
+import 'package:twitter_clone/screens/login_screens/enter_password_screen.dart';
 
-import '../widgets/twitter_button.dart';
+import '../../responsive/mobile_screen_layout.dart';
+import '../main_screen.dart';
+
+import '../../widgets/twitter_button.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = '/loginscreen';
@@ -16,8 +16,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   late final TextEditingController _loginController;
-
-// add locals option
 
   @override
   void initState() {
@@ -34,7 +32,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void navigator() {
-    print('dipa');
     Navigator.pushNamed(context, MobileScreenLayout.routeName);
   }
 
@@ -51,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
           onPressed: () {
             Navigator.of(context).pushNamed(MainLoginScreen.routeName);
           },
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           color: Colors.black,
         ),
       ),
@@ -62,24 +59,20 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(children: [
             Container(
               alignment: Alignment.centerLeft,
-              child: Text(
+              child: const Text(
                 'To get started, first enter your phone, email address or @username',
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700),
               ),
             ),
             TextField(
-              onTap: () {
-                setState(() {
-                  ;
-                });
-              },
-              decoration:
-                  InputDecoration(hintText: 'Phone, email address or username'),
+              controller: _loginController,
+              decoration: const InputDecoration(
+                  hintText: 'Phone, email address or username'),
             ),
-            Expanded(
+            const Expanded(
               child: SizedBox(),
             ),
-            Divider(),
+            const Divider(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -91,7 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 TwitterButton(
                     onPressed: () {
                       Navigator.pushReplacementNamed(
-                          context, MobileScreenLayout.routeName);
+                          context, EnterPasswordScreen.routeName,
+                          arguments: _loginController.text);
                     },
                     buttonsText: 'Next',
                     textColor: Colors.black,

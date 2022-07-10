@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:twitter_clone/utilis/global_variables.dart';
+
+import '../utilis/global_variables.dart';
 
 class MobileScreenLayout extends StatefulWidget {
   static const routeName = '/mainScreen';
@@ -29,7 +30,6 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
   void onPageChanged(int page) {
     setState(() {
       _page = page;
-      print(page);
     });
   }
 
@@ -42,15 +42,15 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(
-        children: homeScreenItems,
         controller: pageController,
         onPageChanged: onPageChanged,
+        children: homeScreenItems,
       ),
       bottomNavigationBar: CupertinoTabBar(
         backgroundColor: Colors.white,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(_page == 0 ? Icons.home : Icons.home),
+            icon: Icon(_page == 0 ? Icons.home : Icons.home_filled),
           ),
           BottomNavigationBarItem(
             icon: Icon(_page == 1 ? Icons.search : Icons.search_off_outlined),

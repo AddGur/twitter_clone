@@ -1,8 +1,5 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
+
 import 'package:provider/provider.dart';
 import 'package:palette_generator/palette_generator.dart';
 
@@ -37,12 +34,11 @@ class _SelectedImageScreenState extends State<SelectedImageScreen> {
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
-            case ConnectionState.waiting:
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             default:
-              if (snapshot.hasError)
-                return new Text('Error: ${snapshot.error}');
-              else {
+              if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
                 mainColor = snapshot.data!.lightVibrantColor!.color;
                 return Scaffold(
                   backgroundColor: mainColor,

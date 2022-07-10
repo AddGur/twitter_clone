@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../screens/login_screen.dart';
-import '../screens/new_account_screen.dart';
+import 'login_screens/login_screen.dart';
+import 'signin_screens/add_first_data_screen.dart';
 
 class MainLoginScreen extends StatelessWidget {
   static const routeName = '/mainloginscreen';
@@ -38,7 +38,7 @@ class MainLoginScreen extends StatelessWidget {
             Column(children: [
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
+                      backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30))),
                   onPressed: () {},
@@ -88,7 +88,8 @@ class MainLoginScreen extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30))),
                   onPressed: () {
-                    Navigator.of(context).pushNamed(NewAccountScreen.routeName);
+                    Navigator.of(context)
+                        .pushNamed(AddFirstDataScreen.routeName);
                   },
                   child: const Text(
                     'Create account',

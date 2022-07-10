@@ -1,19 +1,20 @@
-import 'dart:math';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const routeName = '/profileScreen';
+
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> // {
-    with
-        TickerProviderStateMixin {
+class _ProfileScreenState extends State<ProfileScreen>
+    with TickerProviderStateMixin {
   var top = 0.0;
+  var userDate = {};
 
   late ScrollController _scrollController;
   late TabController _tabController;
@@ -26,12 +27,26 @@ class _ProfileScreenState extends State<ProfileScreen> // {
       setState(() {});
     });
     _tabController = TabController(length: 4, vsync: this);
+    getData();
   }
 
   @override
   void dispose() {
     super.dispose();
     _tabController.dispose();
+  }
+
+  getData() async {
+    try {
+      var userSnap = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+
+      userDate = userSnap.data()!;
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
@@ -50,7 +65,8 @@ class _ProfileScreenState extends State<ProfileScreen> // {
                   pinned: true,
                   snap: false,
                   actions: [
-                    IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+                    IconButton(
+                        onPressed: () {}, icon: const Icon(Icons.search)),
                   ],
                   expandedHeight: 320,
                   flexibleSpace: LayoutBuilder(
@@ -58,14 +74,14 @@ class _ProfileScreenState extends State<ProfileScreen> // {
                       top = cons.biggest.height;
                       return FlexibleSpaceBar(
                           title: AnimatedOpacity(
-                            duration: Duration(milliseconds: 300),
+                            duration: const Duration(milliseconds: 300),
                             opacity: top <= 150 ? 1.0 : 0.0,
                             child: Column(children: [
-                              SizedBox(
+                              const SizedBox(
                                 height: 20,
                               ),
-                              Text('Name'),
-                              Text(
+                              const Text('Name'),
+                              const Text(
                                 'Tweets: 4',
                                 style: TextStyle(fontSize: 14),
                               ),
@@ -81,10 +97,11 @@ class _ProfileScreenState extends State<ProfileScreen> // {
                                   fit: BoxFit.cover,
                                 ),
                               ),
-                              Container(
+                              SizedBox(
                                 height: 200,
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
                                   child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -93,13 +110,13 @@ class _ProfileScreenState extends State<ProfileScreen> // {
                                           alignment: Alignment.topRight,
                                           child: ElevatedButton(
                                               style: ElevatedButton.styleFrom(
-                                                  primary: Colors.white,
+                                                  backgroundColor: Colors.white,
                                                   shape: RoundedRectangleBorder(
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               20))),
                                               onPressed: () {},
-                                              child: Text(
+                                              child: const Text(
                                                 'Edytuj profil',
                                                 style: TextStyle(
                                                     color: Colors.black,
@@ -108,27 +125,27 @@ class _ProfileScreenState extends State<ProfileScreen> // {
                                                         FontWeight.w400),
                                               )),
                                         ),
-                                        Text(
+                                        const Text(
                                           'Name',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 20),
                                         ),
-                                        Text(
+                                        const Text(
                                           '@allias',
                                           style: TextStyle(
                                               color: Colors.grey, fontSize: 15),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 10,
                                         ),
                                         Row(
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.local_hospital_outlined,
                                               size: 15,
                                             ),
-                                            Text(
+                                            const Text(
                                               'Urodziny: 11 czerwaca 2004',
                                               style: TextStyle(
                                                   color: Colors.grey,
@@ -138,11 +155,11 @@ class _ProfileScreenState extends State<ProfileScreen> // {
                                         ),
                                         Row(
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.calendar_month,
                                               size: 15,
                                             ),
-                                            Text(
+                                            const Text(
                                               'Dołączył/a czerwiec 2004',
                                               style: TextStyle(
                                                   color: Colors.grey,
@@ -152,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> // {
                                         ),
                                         Row(
                                           children: [
-                                            Text(
+                                            const Text(
                                               '3 Obserwowani 0 Obserwowani',
                                               style: TextStyle(
                                                   color: Colors.grey,
@@ -173,16 +190,16 @@ class _ProfileScreenState extends State<ProfileScreen> // {
                       controller: _tabController,
                       isScrollable: true,
                       tabs: [
-                        Tab(
+                        const Tab(
                           text: 'Tweety',
                         ),
-                        Tab(
+                        const Tab(
                           text: 'Tweety i odpowiedzi',
                         ),
-                        Tab(
+                        const Tab(
                           text: 'Multimedia',
                         ),
-                        Tab(
+                        const Tab(
                           text: 'Polubienia',
                         ),
                       ]),
@@ -197,16 +214,16 @@ class _ProfileScreenState extends State<ProfileScreen> // {
                             TabBarView(controller: _tabController, children: [
                           ListView.builder(
                             itemBuilder: (context, index) {
-                              return ListTile(
+                              return const ListTile(
                                 leading: CircleAvatar(radius: 10),
                                 title: Text('Title'),
                               );
                             },
                             itemCount: 50,
                           ),
-                          Text('Tweett and answer'),
-                          Text('Multi'),
-                          Text('Multi'),
+                          const Text('Tweett and answer'),
+                          const Text('Multi'),
+                          const Text('Multi'),
                         ]),
                       ),
                     ],
@@ -222,9 +239,9 @@ class _ProfileScreenState extends State<ProfileScreen> // {
   }
 
   Widget _avatar() {
-    final double defaultMargin = 90;
-    final double defaultStart = 80;
-    final double defaultEnd = defaultStart / 2;
+    const double defaultMargin = 90;
+    const double defaultStart = 80;
+    const double defaultEnd = defaultStart / 2;
 
     double top = defaultMargin;
     double scale = 1.0;
@@ -248,6 +265,9 @@ class _ProfileScreenState extends State<ProfileScreen> // {
       child: Transform(
         transform: Matrix4.identity()..scale(scale),
         child: CircleAvatar(
+          backgroundImage: NetworkImage(
+            userDate['photoUrl'],
+          ),
           radius: 35,
         ),
       ),

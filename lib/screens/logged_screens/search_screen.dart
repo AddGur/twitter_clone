@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
-import 'package:twitter_clone/screens/logged_screens/new_post_screen.dart';
-import 'package:twitter_clone/screens/logged_screens/selected_image_screen.dart';
-import 'package:twitter_clone/utilis/dummy_posts.dart';
+//import 'package:provider/provider.dart';
+
+import '../logged_screens/new_post_screen.dart';
+//import 'package:twitter_clone/utilis/dummy_posts.dart';
 import 'package:twitter_clone/widgets/drawer.dart';
-import 'package:twitter_clone/widgets/post_widget.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -19,7 +17,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
-    final posts = Provider.of<Posts>(context);
+    //  final posts = Provider.of<Posts>(context);
 
     return Scaffold(
         backgroundColor: Colors.white,
@@ -33,13 +31,13 @@ class _SearchScreenState extends State<SearchScreen> {
                 height: 30,
                 child: TextField(
                   decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(10),
+                      contentPadding: const EdgeInsets.all(10),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(25),
-                        borderSide: BorderSide(color: Colors.grey),
+                        borderSide: const BorderSide(color: Colors.grey),
                       ),
                       filled: true,
-                      hintStyle: TextStyle(fontSize: 15),
+                      hintStyle: const TextStyle(fontSize: 15),
                       hintText: "Search Twitter",
                       fillColor: Colors.grey[200]),
                 ),
@@ -51,7 +49,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: Builder(builder: (context) {
                   return GestureDetector(
                     onTap: () => Scaffold.of(context).openDrawer(),
-                    child: CircleAvatar(
+                    child: const CircleAvatar(
                       backgroundColor: Colors.red,
                       child: Text(''),
                     ),
@@ -59,8 +57,8 @@ class _SearchScreenState extends State<SearchScreen> {
                 }),
               ),
               actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 10),
+                const Padding(
+                  padding: EdgeInsets.only(right: 10),
                   child: Icon(
                     Icons.settings,
                     color: Colors.black,
@@ -70,7 +68,7 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ],
         ),
-        drawer: TwitterDrawer(),
+        drawer: const TwitterDrawer(),
         floatingActionButton: SpeedDial(
           buttonSize: const Size(50.0, 50.0),
           animatedIcon: AnimatedIcons.menu_close,
@@ -78,16 +76,16 @@ class _SearchScreenState extends State<SearchScreen> {
           onClose: () => Navigator.pushNamed(context, NewPostScreen.routeName),
           children: [
             SpeedDialChild(
-              child: Icon(FontAwesomeIcons.gift),
-              labelWidget: Text('GIF   '),
+              child: const Icon(FontAwesomeIcons.gift),
+              labelWidget: const Text('GIF   '),
             ),
             SpeedDialChild(
-              child: Icon(Icons.mail),
-              labelWidget: Text('Zdjęcia   '),
+              child: const Icon(Icons.mail),
+              labelWidget: const Text('Zdjęcia   '),
             ),
             SpeedDialChild(
-              child: Icon(Icons.mail),
-              labelWidget: Text('Pokoje   '),
+              child: const Icon(Icons.mail),
+              labelWidget: const Text('Pokoje   '),
             ),
           ],
         ));
