@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../utilis/user.dart';
@@ -16,7 +17,8 @@ class AddPasswordScreen extends StatefulWidget {
 
 class _AddPasswordScreenState extends State<AddPasswordScreen> {
   late TextEditingController _password;
-  bool isPasswordShown = false;
+  bool _isPasswordShown = false;
+  bool _isPasswordCorrect = false;
 
   @override
   void initState() {
@@ -63,32 +65,58 @@ class _AddPasswordScreenState extends State<AddPasswordScreen> {
               ),
               TextField(
                   controller: _password,
-                  obscureText: isPasswordShown ? false : true,
+                  obscureText: _isPasswordShown ? false : true,
                   autocorrect: false,
                   autofocus: true,
+                  onChanged: (value) {
+                    if (_password.text.length > 7) {
+                      setState(() {
+                        _isPasswordCorrect = true;
+                      });
+                    } else {
+                      setState(() {
+                        _isPasswordCorrect = false;
+                      });
+                    }
+                  },
                   decoration: InputDecoration(
-                      hintText: 'Password',
-                      suffixIcon: isPasswordShown
-                          ? IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  isPasswordShown = false;
-                                });
-                              },
-                              icon: Icon(
-                                Icons.visibility_off,
-                                color: Colors.green,
-                              ))
-                          : IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  isPasswordShown = true;
-                                });
-                              },
-                              icon: Icon(
-                                Icons.visibility,
-                                color: Colors.red,
-                              )))),
+                      border: OutlineInputBorder(),
+                      labelText: 'Password',
+                      suffixIcon: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _isPasswordShown
+                              ? IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _isPasswordShown = false;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.visibility_off,
+                                    color: Colors.green,
+                                  ))
+                              : IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _isPasswordShown = true;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    Icons.visibility,
+                                    color: Colors.red,
+                                  )),
+                          if (!_isPasswordCorrect && _password.text.isNotEmpty)
+                            const Icon(
+                              FontAwesomeIcons.circleExclamation,
+                              color: Colors.red,
+                            ),
+                          SizedBox(
+                            width: 10,
+                          )
+                        ],
+                      ))),
               Expanded(child: Container()),
               Divider(),
               Row(
@@ -101,11 +129,7 @@ class _AddPasswordScreenState extends State<AddPasswordScreen> {
                               context, AddProfilePictureScreen.routeName);
                           userData.password = _password.text;
                         } on FirebaseAuthException catch (e) {
-                          if (e.code == 'weak-password') {
-                            print('The password provided is too weak.');
-                          } else if (e.code == 'email-already-in-use') {
-                            print('The account already exists for that email.');
-                          }
+                          print(e);
                         } catch (e) {
                           print(e);
                         }

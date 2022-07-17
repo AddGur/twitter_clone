@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:twitter_clone/resources/auth_method.dart';
 
 import 'login_screens/login_screen.dart';
 import 'signin_screens/add_first_data_screen.dart';
@@ -41,7 +42,9 @@ class MainLoginScreen extends StatelessWidget {
                       backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30))),
-                  onPressed: () {},
+                  onPressed: () {
+                    AuthMethod().logoutUser();
+                  },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

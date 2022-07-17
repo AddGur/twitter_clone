@@ -39,7 +39,6 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (ctx) => Posts()),
         ChangeNotifierProvider(create: (ctx) => IsCommentEmpty()),
-        ChangeNotifierProvider(create: (ctx) => IsNameEmpty()),
         ChangeNotifierProvider(create: (ctx) => NewUser()),
         ChangeNotifierProvider(create: (ctx) => RandomUsers()),
         ChangeNotifierProvider(create: (ctx) => UserProvider()),

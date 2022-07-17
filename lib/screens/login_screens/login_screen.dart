@@ -1,10 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:twitter_clone/screens/login_screens/enter_password_screen.dart';
+import 'package:twitter_clone/widgets/snackbar.dart';
 
 import '../../responsive/mobile_screen_layout.dart';
 import '../main_screen.dart';
 
 import '../../widgets/twitter_button.dart';
+
+import 'dart:developer' as devtools show log;
 
 class LoginScreen extends StatefulWidget {
   static const routeName = '/loginscreen';
@@ -16,6 +20,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   late final TextEditingController _loginController;
+  bool isContains = false;
 
   @override
   void initState() {
@@ -33,6 +38,34 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void navigator() {
     Navigator.pushNamed(context, MobileScreenLayout.routeName);
+  }
+
+  Future getFireData(String dataType) async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .where(dataType, isEqualTo: _loginController.text)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        setState(() {
+          isContains = true;
+        });
+      });
+    });
+  }
+
+  Future checkEmail() async {
+    if (RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(_loginController.text)) {
+      await getFireData('email');
+    } else if (RegExp(
+            r'^[\+]?[(]?[[0-9]?[0-9]?[0-9]?[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$')
+        .hasMatch(_loginController.text)) {
+      await getFireData('phoneNumer');
+    } else {
+      await getFireData('alias');
+    }
   }
 
   @override
@@ -64,10 +97,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700),
               ),
             ),
+            SizedBox(
+              height: 20,
+            ),
             TextField(
               controller: _loginController,
               decoration: const InputDecoration(
-                  hintText: 'Phone, email address or username'),
+                  border: const OutlineInputBorder(),
+                  labelText: 'Phone, email address or username'),
             ),
             const Expanded(
               child: SizedBox(),
@@ -82,14 +119,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     textColor: Colors.black,
                     backgroundColor: Colors.white),
                 TwitterButton(
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(
-                          context, EnterPasswordScreen.routeName,
-                          arguments: _loginController.text);
+                    onPressed: () async {
+                      await checkEmail();
+                      isContains
+                          ? Navigator.pushReplacementNamed(
+                              context, EnterPasswordScreen.routeName,
+                              arguments: _loginController.text)
+                          : showSnackBar(
+                              'Sorry, we could not find your account.',
+                              context,
+                              30);
                     },
                     buttonsText: 'Next',
-                    textColor: Colors.black,
-                    backgroundColor: Colors.white)
+                    textColor: Colors.white,
+                    backgroundColor: Colors.black)
               ],
             ),
           ]),

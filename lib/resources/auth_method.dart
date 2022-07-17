@@ -55,16 +55,8 @@ class AuthMethod {
     required String email,
     required String password,
   }) async {
-    try {
-      if (email.isNotEmpty || password.isNotEmpty) {
-        await _auth.signInWithEmailAndPassword(
-            email: email, password: password);
-      }
-    } on FirebaseAuthException catch (e) {
-      devtools.log('Failed with error code: ${e.code}');
-      return print(e.message);
-    } catch (e) {
-      print(e);
+    if (password.isNotEmpty) {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
     }
   }
 

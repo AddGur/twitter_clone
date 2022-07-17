@@ -18,8 +18,13 @@ class TwitterButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
+          side: BorderSide(
+            width: 1.0,
+            color: Colors.grey,
+          ),
+          elevation: 0,
           shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
       child: Text(
         buttonsText,
         style: TextStyle(color: textColor),

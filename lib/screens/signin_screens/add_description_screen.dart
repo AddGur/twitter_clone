@@ -86,7 +86,9 @@ class _AddDescriptionScreenState extends State<AddDescriptionScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TwitterButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, AddAliasScreen.routeName);
+                      },
                       buttonsText: 'Skip for now',
                       textColor: Colors.black,
                       backgroundColor: Colors.white),

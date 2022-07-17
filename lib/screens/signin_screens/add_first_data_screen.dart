@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:email_auth/email_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -29,10 +32,13 @@ class _AddFirstDataScreenState extends State<AddFirstDataScreen> {
   late final TextEditingController _passwordController;
   late FocusNode _focus;
 
-  int nameLength = 50;
-  int phoneLegth = 9;
-  bool _isFocused = false;
+  int nameLength = 0;
+  bool _isFocusedEmailPhone = false;
   bool _emailChoosen = true;
+  bool _isNumberCorrect = false;
+  bool _isNameCorrect = true;
+  bool _isEmailCorrect = false;
+  bool _isEmailExists = false;
 
   DateTime birthdayDate = DateTime.now();
 
@@ -44,6 +50,7 @@ class _AddFirstDataScreenState extends State<AddFirstDataScreen> {
     _birtdayController = TextEditingController();
     _passwordController = TextEditingController();
     _focus = FocusNode();
+
     super.initState();
   }
 
@@ -85,9 +92,21 @@ class _AddFirstDataScreenState extends State<AddFirstDataScreen> {
     }
   }
 
+  Future getFireData() async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .where("email", isEqualTo: _emailController.text)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      _isEmailExists = false;
+      querySnapshot.docs.forEach((doc) {
+        _isEmailExists = true;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final IsNameEmpty isNameEmpty = Provider.of<IsNameEmpty>(context);
     final userData = Provider.of<NewUser>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
@@ -107,159 +126,241 @@ class _AddFirstDataScreenState extends State<AddFirstDataScreen> {
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(25.0),
-        child: Center(
-          child: Column(children: [
-            Container(
-              alignment: Alignment.centerLeft,
-              child: const Text(
-                'Create your account',
-                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700),
-              ),
-            ),
-            TextField(
-              autofocus: true,
-              onTap: () {
-                setState(() {
-                  _isFocused = false;
-                });
-              },
-              textInputAction: TextInputAction.next,
-              onEditingComplete: () {
-                FocusScope.of(context).nextFocus();
-                setState(() {
-                  _isFocused = true;
-                });
-              },
-              controller: _nameController,
-              decoration: InputDecoration(
-                  suffixIcon: isNameEmpty.isNameEmpty
-                      ? null
-                      : const Icon(
-                          FontAwesomeIcons.circleCheck,
-                          color: Colors.green,
-                        ),
-                  hintText: 'Name',
-                  counterText: nameLength.toString(),
-                  counterStyle: TextStyle(
-                      color: nameLength > 0 ? Colors.black : Colors.red)),
-              onChanged: (value) {
-                setState(() {
-                  nameLength = 50 - _nameController.text.length;
-
-                  if (_nameController.text.isEmpty) {
-                    context.read<IsNameEmpty>().setTrue();
-                  } else {
-                    context.read<IsNameEmpty>().setFalse();
-                  }
-                });
-              },
-            ),
-            TextField(
-                onTap: () {
-                  setState(() {
-                    _isFocused = true;
-                  });
-                },
-                focusNode: _focus,
-                textInputAction: TextInputAction.next,
-                onEditingComplete: () {
-                  FocusScope.of(context).nextFocus();
-                  setState(() {
-                    _isFocused = false;
-                  });
-                  _selectDate(context);
-                },
-                keyboardType:
-                    _emailChoosen ? TextInputType.phone : TextInputType.text,
-                decoration: InputDecoration(
-                    hintText: _isFocused
-                        ? _emailChoosen
-                            ? 'Phone number'
-                            : 'Email address'
-                        : 'Phone number or email address'),
-                controller:
-                    _emailChoosen ? _numberController : _emailController),
-            GestureDetector(
-              onTap: () {
-                _selectDate(context);
-                setState(() {
-                  _isFocused = false;
-                });
-              },
-              child: AbsorbPointer(
-                child: TextField(
-                  controller: _birtdayController,
-                  decoration: const InputDecoration(
-                    hintText: 'Date of birth',
+        child: CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: Column(children: [
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: const Text(
+                      'Create your account',
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.w700),
+                    ),
                   ),
-                ),
-              ),
-            ),
-            const Expanded(child: SizedBox()),
-            const Divider(),
-            Row(
-              mainAxisAlignment: _isFocused
-                  ? MainAxisAlignment.spaceBetween
-                  : MainAxisAlignment.end,
-              children: [
-                _isFocused
-                    ? ElevatedButton(
-                        onPressed: () {
-                          _switchKeybordType();
-
-                          _emailChoosen
-                              ? userData.email = ''
-                              : userData.phoneNumber = '';
-                        },
-                        child: Text(_emailChoosen
-                            ? 'Use email instead'
-                            : 'Use phone instead'))
-                    : const SizedBox(),
-                TwitterButton(
-                    onPressed: () {
-                      if (_nameController.text.isNotEmpty &&
-                              _birtdayController.text.isNotEmpty &&
-                              _emailController.text.isNotEmpty ||
-                          _numberController.text.isNotEmpty) {
-                        if (_emailController.text.isNotEmpty) {
-                          userData.setUserEmail(_nameController.text,
-                              _emailController.text, _birtdayController.text);
-
-                          devtools.log(userData.phoneNumber);
-                          Navigator.pushNamed(
-                              context, AddPasswordScreen.routeName);
-                        } else {
-                          userData.setUserPhone(_nameController.text,
-                              _numberController.text, _birtdayController.text);
-
-                          Navigator.pushNamed(
-                              context, AddEmailAdressScreen.routeName);
-                        }
-                      }
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextField(
+                    autofocus: true,
+                    onTap: () {
+                      setState(() {
+                        _isFocusedEmailPhone = false;
+                      });
                     },
-                    buttonsText: 'Next',
-                    textColor: Colors.black,
-                    backgroundColor: Colors.white)
-              ],
-            ),
-          ]),
+                    textInputAction: TextInputAction.next,
+                    onEditingComplete: () {
+                      FocusScope.of(context).nextFocus();
+                      setState(() {
+                        _isFocusedEmailPhone = true;
+                      });
+                    },
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      suffixIcon: nameLength == 0
+                          ? null
+                          : _isNameCorrect
+                              ? const Icon(
+                                  FontAwesomeIcons.circleCheck,
+                                  color: Colors.green,
+                                )
+                              : const Icon(
+                                  FontAwesomeIcons.circleExclamation,
+                                  color: Colors.red,
+                                ),
+                      labelText: 'Name',
+                      counterText: '${nameLength.toString()}/50',
+                      errorText: _isNameCorrect
+                          ? null
+                          : 'Must be 50 characters or fewer',
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        nameLength = _nameController.text.length;
+                        if (nameLength > 50) {
+                          _isNameCorrect = false;
+                          devtools.log(_isNameCorrect.toString());
+                        } else {
+                          _isNameCorrect = true;
+                          devtools.log(_isNameCorrect.toString());
+                        }
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  TextField(
+                      onTap: () {
+                        setState(() {
+                          _isFocusedEmailPhone = true;
+                        });
+                      },
+                      onChanged: (value) async {
+                        await getFireData();
+
+                        setState(() {
+                          if (_emailChoosen) {
+                            if (RegExp(
+                                    r'^[\+]?[(]?[[0-9]?[0-9]?[0-9]?[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$')
+                                .hasMatch(_numberController.text)) {
+                              _isNumberCorrect = true;
+                              devtools
+                                  .log('Numb ${_isNumberCorrect..toString()}');
+                            } else {
+                              _isNumberCorrect = false;
+                              devtools
+                                  .log('Numb ${_isNumberCorrect..toString()}');
+                            }
+                          } else {
+                            if (RegExp(
+                                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                .hasMatch(_emailController.text)) {
+                              _isEmailCorrect = true;
+                              devtools
+                                  .log('Email ${_isEmailCorrect..toString()}');
+                            } else {
+                              _isEmailCorrect = false;
+                              devtools
+                                  .log('Email ${_isEmailCorrect..toString()}');
+                            }
+                          }
+                        });
+                      },
+                      focusNode: _focus,
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).nextFocus();
+                        setState(() {
+                          _isFocusedEmailPhone = false;
+                        });
+                        _selectDate(context);
+                      },
+                      keyboardType: _emailChoosen
+                          ? TextInputType.phone
+                          : TextInputType.text,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        suffixIcon: (_emailChoosen
+                                ? _numberController.text.isEmpty
+                                : _emailController.text.isEmpty)
+                            ? null
+                            : (_emailChoosen
+                                    ? _isNumberCorrect
+                                    : (_isEmailCorrect && !_isEmailExists))
+                                ? const Icon(
+                                    FontAwesomeIcons.circleCheck,
+                                    color: Colors.green,
+                                  )
+                                : const Icon(
+                                    FontAwesomeIcons.circleExclamation,
+                                    color: Colors.red,
+                                  ),
+                        labelText: _isFocusedEmailPhone
+                            ? _emailChoosen
+                                ? 'Phone number'
+                                : 'Email address'
+                            : 'Phone number or email address',
+                        errorText: (_emailChoosen
+                                ? _numberController.text.isEmpty
+                                : _emailController.text.isEmpty)
+                            ? null
+                            : (_emailChoosen
+                                    ? _isNumberCorrect
+                                    : _isEmailCorrect)
+                                ? (_isEmailExists
+                                    ? 'Email already exists'
+                                    : null)
+                                : (_emailChoosen
+                                    ? 'Please enter a valid phone number'
+                                    : 'Please enter a valid email'),
+                      ),
+                      controller:
+                          _emailChoosen ? _numberController : _emailController),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _selectDate(context);
+                      setState(() {
+                        _isFocusedEmailPhone = false;
+                      });
+                    },
+                    child: AbsorbPointer(
+                      child: TextField(
+                        controller: _birtdayController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Date of birth',
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(child: SizedBox()),
+                  const Divider(),
+                  Row(
+                    mainAxisAlignment: _isFocusedEmailPhone
+                        ? MainAxisAlignment.spaceBetween
+                        : MainAxisAlignment.end,
+                    children: [
+                      _isFocusedEmailPhone
+                          ? ElevatedButton(
+                              onPressed: () {
+                                _switchKeybordType();
+
+                                _emailChoosen
+                                    ? userData.email = ''
+                                    : userData.phoneNumber = '';
+                              },
+                              child: Text(_emailChoosen
+                                  ? 'Use email instead'
+                                  : 'Use phone instead'))
+                          : const SizedBox(),
+                      TwitterButton(
+                          onPressed: () {
+                            if (_emailChoosen
+                                ? _isNumberCorrect
+                                : (_isEmailCorrect && !_isEmailExists) &&
+                                    _isNameCorrect) {
+                              if (_nameController.text.isNotEmpty &&
+                                      _birtdayController.text.isNotEmpty &&
+                                      _emailController.text.isNotEmpty ||
+                                  _numberController.text.isNotEmpty) {
+                                if (_emailController.text.isNotEmpty) {
+                                  userData.setUserEmail(
+                                      _nameController.text,
+                                      _emailController.text,
+                                      _birtdayController.text);
+
+                                  Navigator.pushNamed(
+                                      context, AddPasswordScreen.routeName);
+                                } else {
+                                  userData.setUserPhone(
+                                      _nameController.text,
+                                      _numberController.text,
+                                      _birtdayController.text);
+
+                                  Navigator.pushNamed(
+                                      context, AddEmailAdressScreen.routeName);
+                                }
+                              }
+                            }
+                          },
+                          buttonsText: 'Next',
+                          textColor: Colors.black,
+                          backgroundColor: Colors.white)
+                    ],
+                  ),
+                ]),
+              ),
+            )
+          ],
         ),
       ),
     );
-  }
-}
-
-class IsNameEmpty with ChangeNotifier {
-  bool _isNameEmpty = true;
-  bool get isNameEmpty => _isNameEmpty;
-
-  void setFalse() {
-    _isNameEmpty = false;
-    notifyListeners();
-  }
-
-  void setTrue() {
-    _isNameEmpty = true;
-    notifyListeners();
   }
 }

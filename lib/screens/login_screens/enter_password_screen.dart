@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:twitter_clone/resources/auth_method.dart';
@@ -12,6 +11,7 @@ import '../../../widgets/twitter_button.dart';
 import 'dart:developer' as devtools show log;
 
 import '../../responsive/mobile_screen_layout.dart';
+import '../../widgets/snackbar.dart';
 
 class EnterPasswordScreen extends StatefulWidget {
   static const routeName = '/enterpasswordscreen';
@@ -40,9 +40,12 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
   }
 
   void loginUser() async {
-    await AuthMethod().loginUser(email: email, password: _password.text);
-    //devtools.log(FirebaseAuth.instance.currentUser!.uid);
-    Navigator.pushNamed(context, MobileScreenLayout.routeName);
+    try {
+      await AuthMethod().loginUser(email: email, password: _password.text);
+      Navigator.pushNamed(context, MobileScreenLayout.routeName);
+    } on FirebaseAuthException catch (e) {
+      showSnackBar('Wrong password!', context, 100);
+    }
   }
 
   Future takeEmailAdress(String dataType, String input) async {
@@ -67,8 +70,8 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
         email = text;
       });
     } else if (RegExp(
-        // r'^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$')
-        '[0-9]{9}').hasMatch(text)) {
+            r'^[\+]?[(]?[[0-9]?[0-9]?[0-9]?[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$')
+        .hasMatch(text)) {
       takeEmailAdress("phoneNumer", text);
     } else {
       takeEmailAdress("alias", text);
@@ -79,7 +82,6 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments.toString();
     login = args;
-    final userData = Provider.of<NewUser>(context);
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -94,21 +96,21 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Enter your password',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               TextField(
                   enableInteractiveSelection: false,
                   focusNode: AlwaysDisabledFocusNode(),
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     hintText: login,
                   )),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               TextField(
@@ -117,7 +119,7 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
                   autocorrect: false,
                   autofocus: true,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                       labelText: 'Password',
                       suffixIcon: isPasswordShown
                           ? IconButton(
@@ -126,35 +128,29 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
                                   isPasswordShown = false;
                                 });
                               },
-                              icon: Icon(
-                                Icons.visibility_off,
-                                color: Colors.green,
+                              icon: const Icon(
+                                Icons.visibility,
+                                color: Colors.red,
                               ))
                           : IconButton(
                               onPressed: () {
-                                // setState(() {
-                                //   isPasswordShown = true;
-                                // });
-                                AuthMethod().logoutUser();
+                                setState(() {
+                                  isPasswordShown = true;
+                                });
                               },
-                              icon: Icon(
-                                Icons.visibility,
-                                color: Colors.red,
+                              icon: const Icon(
+                                Icons.visibility_off,
+                                color: Colors.green,
                               )))),
               Expanded(child: Container()),
-              Divider(),
+              const Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TwitterButton(
                       onPressed: () async {
-                        try {
-                          await checkEmail(login);
-                          loginUser();
-                        } on FirebaseAuthException catch (e) {
-                        } catch (e) {
-                          print(e);
-                        }
+                        await checkEmail(login);
+                        loginUser();
                       },
                       buttonsText: 'Next',
                       textColor: Colors.black,

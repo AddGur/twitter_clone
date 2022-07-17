@@ -105,7 +105,10 @@ class _AddProfilePictureScreenState extends State<AddProfilePictureScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TwitterButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(
+                            context, AddDescriptionScreen.routeName);
+                      },
                       buttonsText: 'Skip for now',
                       textColor: Colors.black,
                       backgroundColor: Colors.white),

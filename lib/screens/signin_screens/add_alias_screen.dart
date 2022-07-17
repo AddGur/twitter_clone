@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -20,11 +23,24 @@ class AddAliasScreen extends StatefulWidget {
 
 class _AddAliasScreenState extends State<AddAliasScreen> {
   late TextEditingController _alias;
+  var randNumb = Random().nextInt(900000) + 100000;
+  var randName;
+  bool _aliasExists = false;
 
   @override
   void initState() {
+    final userData = Provider.of<NewUser>(context, listen: false);
+
     super.initState();
     _alias = TextEditingController();
+    randName = ('${userData.name}${randNumb}');
+    _alias.text = randName;
+    getFireData();
+    if (_aliasExists) {
+      randNumb++;
+      randName = ('${userData.name}${randNumb}');
+      _alias.text = randName;
+    }
   }
 
   @override
@@ -45,6 +61,20 @@ class _AddAliasScreenState extends State<AddAliasScreen> {
         birthday: userData.birthday,
         file: userData.photoUrl);
     Navigator.pushNamed(context, MobileScreenLayout.routeName);
+  }
+
+  Future getFireData() async {
+    await FirebaseFirestore.instance
+        .collection("users")
+        .where("alias", isEqualTo: _alias.text)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      _aliasExists = false;
+
+      querySnapshot.docs.forEach((doc) {
+        _aliasExists = true;
+      });
+    });
   }
 
   @override
@@ -93,7 +123,10 @@ class _AddAliasScreenState extends State<AddAliasScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TwitterButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        _alias.text = randName;
+                        signUpUser();
+                      },
                       buttonsText: 'Skip',
                       textColor: Colors.black,
                       backgroundColor: Colors.white),
