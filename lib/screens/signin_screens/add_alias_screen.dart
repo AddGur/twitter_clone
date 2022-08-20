@@ -2,13 +2,16 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:provider/provider.dart';
 import 'package:twitter_clone/resources/auth_method.dart';
 import 'package:twitter_clone/responsive/mobile_screen_layout.dart';
 import 'package:twitter_clone/screens/logged_screens/home_screen.dart';
 import 'package:twitter_clone/utilis/user.dart';
+import 'package:twitter_clone/widgets/snackbar.dart';
 
+import '../../providers/user_provider.dart';
 import '../../widgets/twitter_button.dart';
 
 import 'dart:developer' as devtools show log;
@@ -52,15 +55,30 @@ class _AddAliasScreenState extends State<AddAliasScreen> {
   void signUpUser() async {
     final userData = Provider.of<NewUser>(context, listen: false);
 
-    await AuthMethod().createUser(
+    String res = await AuthMethod().createUser(
         email: userData.email,
         password: userData.password,
         username: userData.name,
         discrption: userData.description,
         alias: _alias.text,
+        phoneNumber: '',
         birthday: userData.birthday,
+        joined: DateFormat.yMMMM().format(DateTime.now()),
         file: userData.photoUrl);
-    Navigator.pushNamed(context, MobileScreenLayout.routeName);
+    if (res != 'success') {
+      showSnackBar('err', context, 30);
+      devtools.log("dupa");
+    } else {
+      await addData();
+
+      Navigator.pushNamed(context, MobileScreenLayout.routeName);
+    }
+  }
+
+  addData() async {
+    UserProvider _userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    await _userProvider.refreshUser();
   }
 
   Future getFireData() async {
@@ -125,7 +143,7 @@ class _AddAliasScreenState extends State<AddAliasScreen> {
                   TwitterButton(
                       onPressed: () {
                         _alias.text = randName;
-                        signUpUser();
+                        signUpUser;
                       },
                       buttonsText: 'Skip',
                       textColor: Colors.black,

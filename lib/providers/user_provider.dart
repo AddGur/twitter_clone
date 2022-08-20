@@ -1,18 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:twitter_clone/resources/auth_method.dart';
-
+import 'package:flutter/widgets.dart';
+import '../resources/auth_method.dart';
 import '../utilis/user.dart';
 
 class UserProvider with ChangeNotifier {
-  Users? _users;
+  User? _user;
   final AuthMethod _authMethod = AuthMethod();
 
-  Users get getUser => _users!;
+  User get getUser => _user!;
 
   Future<void> refreshUser() async {
-    Users users = await _authMethod.getUserDetails();
-    _users = users;
+    User user = await _authMethod.getUserDetails();
+    _user = user;
     notifyListeners();
   }
 }

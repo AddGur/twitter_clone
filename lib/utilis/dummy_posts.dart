@@ -32,7 +32,8 @@ class PostData {
 class Posts with ChangeNotifier {
   final List<PostData> _dummyPosts = [
     PostData(
-      postId: '1',
+      postId:
+          "1",
       name: 'John Doe',
       userImageUrl: 'https://pic.onlinewebfonts.com/svg/img_74993.png',
       postImageUrl:
@@ -44,47 +45,6 @@ class Posts with ChangeNotifier {
       commentsCounter: 0,
       shareCounter: 0,
       likesCounter: 0,
-    ),
-    PostData(
-      postId: '2',
-      name: 'Jane Doe',
-      userImageUrl:
-          'https://icons-for-free.com/iconfiles/png/512/user+icon-1320190636314922883.png',
-      postImageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/080103_hakkai_fuji.jpg/1280px-080103_hakkai_fuji.jpg',
-      alias: '@jane',
-      date: DateTime.now(),
-      description:
-          'A mountain is an elevated portion of the Earth\'s crust, generally with steep sides that show significant exposed bedrock.',
-      commentsCounter: 3,
-      shareCounter: 2,
-      likesCounter: 14,
-    ),
-    PostData(
-      postId: '3',
-      name: 'Jane Doe',
-      userImageUrl:
-          'https://icons-for-free.com/iconfiles/png/512/user+icon-1320190636314922883.png',
-      alias: '@jane',
-      date: DateTime.now(),
-      description: 'Post without image',
-      commentsCounter: 3,
-      shareCounter: 2,
-      likesCounter: 14,
-    ),
-    PostData(
-      postId: '4',
-      name: 'John Doe',
-      userImageUrl: 'https://pic.onlinewebfonts.com/svg/img_74993.png',
-      postImageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Paracas_National_Reserve%2C_Ica%2C_Peru-3April2011.jpg/1280px-Paracas_National_Reserve%2C_Ica%2C_Peru-3April2011.jpg',
-      alias: '@johny',
-      date: DateTime.now(),
-      description:
-          'The sea, connected as the world ocean or simply the ocean, is the body of salty water that covers approximately 71 percent of the Earth\'s surface. ',
-      commentsCounter: 5,
-      shareCounter: 3,
-      likesCounter: 8,
     ),
   ];
 

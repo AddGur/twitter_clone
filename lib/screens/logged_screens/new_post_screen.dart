@@ -1,9 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:developer' as devtools show log;
 import 'dart:io';
 
 import 'package:provider/provider.dart';
+import 'package:twitter_clone/resources/firestore_methods.dart';
+import '../../providers/user_provider.dart';
+import '../../utilis/user.dart' as model;
 
 class NewPostScreen extends StatefulWidget {
   static const routeName = '/newPostScreen';
@@ -14,26 +19,49 @@ class NewPostScreen extends StatefulWidget {
 }
 
 class _NewPostScreenState extends State<NewPostScreen> {
-  late TextEditingController _commentsController;
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: Text('a'),
+  //     ),
+  //     body: Column(
+  //       children: [
+  //         ElevatedButton(
+  //           onPressed: selectImages,
+  //           child: Text('dupa'),
+  //         ),
+  //         ElevatedButton(
+  //             onPressed: () => uploadFiles(_imageFileList), child: Text('up')),
+  //         ElevatedButton(
+  //             onPressed: () => print(_imageFileList.length.toString()),
+  //             child: Text('print'))
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  late TextEditingController _tweetController;
 
   final ImagePicker _picker = ImagePicker();
-  final List<XFile> _imageFileList = [];
+  final List<File> _imageFileList = [];
 
   @override
   void initState() {
-    _commentsController = TextEditingController();
+    _tweetController = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
-    _commentsController.dispose();
+    _tweetController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final IsCommentEmpty isCommentEmpty = Provider.of<IsCommentEmpty>(context);
+    final model.User _user = Provider.of<UserProvider>(context).getUser;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -57,9 +85,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                isCommentEmpty.commentIsEmpty
-                    ? devtools.log(_commentsController.text)
-                    : null;
+                postTweet(
+                    _user.uid, _user.username, _user.photoUrl!, _user.alias);
               },
               child: const Text('Tweet'),
               style: ElevatedButton.styleFrom(
@@ -97,9 +124,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   child: Column(
                     children: [
                       TextField(
-                        controller: _commentsController,
+                        controller: _tweetController,
                         onChanged: (value) {
-                          if (_commentsController.text.isNotEmpty) {
+                          if (_tweetController.text.isNotEmpty) {
                             context.read<IsCommentEmpty>().setTrue();
                           } else {
                             context.read<IsCommentEmpty>().setFalse();
@@ -256,24 +283,37 @@ class _NewPostScreenState extends State<NewPostScreen> {
   }
 
   void selectImages() async {
-    final List<XFile>? selectedImages = await _picker.pickMultiImage();
-    if (selectedImages!.isNotEmpty) {
-      setState(() {
-        _imageFileList.addAll(selectedImages);
-      });
+    var selectedImage = await _picker.pickImage(source: ImageSource.gallery);
+    if (selectedImage == null) {
+      return;
     }
+    setState(() {
+      var img = File(selectedImage.path);
+      _imageFileList.add(img);
+    });
+
     devtools.log(_imageFileList.length.toString());
   }
 
   void takePicture() async {
-    final takenPicture =
+    var takenPicture =
         await _picker.pickImage(source: ImageSource.camera, maxWidth: 600);
     if (takenPicture == null) {
       return;
     }
     setState(() {
-      _imageFileList.add(takenPicture);
+      var img = File(takenPicture.path);
+
+      _imageFileList.add(img);
+      devtools.log(img.toString());
     });
+  }
+
+  void postTweet(
+      String uid, String username, String profImage, String alias) async {
+    String res = await FirestoreMethods().uploadPost(
+        _tweetController.text, _imageFileList, uid, username, alias, profImage);
+    Navigator.pop(context);
   }
 
   void removeImage(int number) {

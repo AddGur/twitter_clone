@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/user_provider.dart';
 import '../utilis/global_variables.dart';
 
 class MobileScreenLayout extends StatefulWidget {
@@ -18,7 +20,15 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
   @override
   void initState() {
     super.initState();
+    addData();
+
     pageController = PageController();
+  }
+
+  addData() async {
+    UserProvider _userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    await _userProvider.refreshUser();
   }
 
   @override

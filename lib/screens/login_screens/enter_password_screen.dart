@@ -10,6 +10,7 @@ import '../../../widgets/twitter_button.dart';
 
 import 'dart:developer' as devtools show log;
 
+import '../../providers/user_provider.dart';
 import '../../responsive/mobile_screen_layout.dart';
 import '../../widgets/snackbar.dart';
 
@@ -25,12 +26,20 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
   late TextEditingController _password;
   String email = '';
   bool isPasswordShown = false;
+  bool isPasswordEmpty = true;
   String login = '';
 
   @override
   void initState() {
     super.initState();
+
     _password = TextEditingController();
+  }
+
+  addData() async {
+    UserProvider _userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    await _userProvider.refreshUser();
   }
 
   @override
@@ -41,8 +50,13 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
 
   void loginUser() async {
     try {
-      await AuthMethod().loginUser(email: email, password: _password.text);
-      Navigator.pushNamed(context, MobileScreenLayout.routeName);
+      String res = await AuthMethod()
+          .loginUser(email: email, password: _password.text, context: context);
+      if (res == 'success') {
+        await addData();
+
+        Navigator.pushNamed(context, MobileScreenLayout.routeName);
+      }
     } on FirebaseAuthException catch (e) {
       showSnackBar('Wrong password!', context, 100);
     }
@@ -72,9 +86,9 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
     } else if (RegExp(
             r'^[\+]?[(]?[[0-9]?[0-9]?[0-9]?[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$')
         .hasMatch(text)) {
-      takeEmailAdress("phoneNumer", text);
+      await takeEmailAdress("phoneNumer", text);
     } else {
-      takeEmailAdress("alias", text);
+      await takeEmailAdress("alias", text);
     }
   }
 
@@ -118,6 +132,15 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
                   obscureText: isPasswordShown ? false : true,
                   autocorrect: false,
                   autofocus: true,
+                  onChanged: (value) {
+                    if (value.length > 0) {
+                      setState(() {
+                        isPasswordEmpty = false;
+                      });
+                    } else {
+                      isPasswordEmpty = true;
+                    }
+                  },
                   decoration: InputDecoration(
                       border: const OutlineInputBorder(),
                       labelText: 'Password',
@@ -149,12 +172,14 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
                 children: [
                   TwitterButton(
                       onPressed: () async {
-                        await checkEmail(login);
-                        loginUser();
+                        _password.text.isNotEmpty
+                            ? await checkEmail(login)
+                            : null;
+                        _password.text.isNotEmpty ? loginUser() : null;
                       },
-                      buttonsText: 'Next',
-                      textColor: Colors.black,
-                      backgroundColor: Colors.white),
+                      buttonsText: 'Log in',
+                      textColor: Colors.white,
+                      backgroundColor: Colors.black),
                 ],
               )
             ],

@@ -1,17 +1,31 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:twitter_clone/utilis/user.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
+import '../providers/user_provider.dart';
+import '../screens/logged_screens/selected_image_screen.dart';
 import '../utilis/dummy_posts.dart';
+import 'dart:developer' as devtools show log;
 
-class PostWidget extends StatelessWidget {
-  final PostData postData;
+class PostWidget extends StatefulWidget {
+  final snap;
   const PostWidget({
     super.key,
-    required this.postData,
+    required this.snap,
   });
 
   @override
+  State<PostWidget> createState() => _PostWidgetState();
+}
+
+class _PostWidgetState extends State<PostWidget> {
+  @override
   Widget build(BuildContext context) {
+    // final User user = Provider.of<UserProvider>(context).getUser;
+
     return Container(
       padding: const EdgeInsets.all(10),
       child: Column(children: [
@@ -20,7 +34,7 @@ class PostWidget extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 30,
-              backgroundImage: NetworkImage(postData.userImageUrl),
+              backgroundImage: NetworkImage(widget.snap['profImage']),
             ),
             const SizedBox(
               width: 5,
@@ -36,11 +50,11 @@ class PostWidget extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            postData.name,
+                            widget.snap['username'],
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            postData.alias,
+                            widget.snap['alias'],
                             style: TextStyle(
                                 fontWeight: FontWeight.w400,
                                 color: Colors.grey[700]),
@@ -59,33 +73,88 @@ class PostWidget extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Text(postData.description),
-                  if (postData.postImageUrl != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Hero(
-                          tag: 'post-${postData.postImageUrl}',
-                          child: Image.network(
-                            postData.postImageUrl!,
-                          ),
-                        ),
-                      ),
+                  Text(
+                    widget.snap['description'],
+                  ),
+                  if (widget.snap['postUrl'] != null)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: widget.snap['postUrl'].length == 1
+                          ? GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pushNamed(
+                                    SelectedImageScreen.routeName,
+                                    arguments: PassArguments(
+                                        widget.snap['postId'], 0));
+                              },
+                              child: Image.network(
+                                widget.snap['postUrl'][0],
+                              ),
+                            )
+                          : widget.snap['postUrl'].length == 3
+                              ? StaggeredGridView.countBuilder(
+                                  scrollDirection: Axis.vertical,
+                                  physics: PageScrollPhysics(),
+                                  shrinkWrap: true,
+                                  crossAxisCount: 2,
+                                  itemCount: widget.snap['postUrl'].length,
+                                  itemBuilder: (context, index) =>
+                                      GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pushNamed(
+                                          SelectedImageScreen.routeName,
+                                          arguments: PassArguments(
+                                              widget.snap['postId'], index));
+                                    },
+                                    child: Image.network(
+                                      widget.snap['postUrl'][index],
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  staggeredTileBuilder: (index) =>
+                                      StaggeredTile.count(
+                                    (index % 2 == 0) ? 1 : 1,
+                                    (index % 2 == 0) ? 1 : 2,
+                                  ),
+                                  mainAxisSpacing: 2,
+                                  crossAxisSpacing: 2,
+                                )
+                              : StaggeredGridView.countBuilder(
+                                  physics: PageScrollPhysics(),
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  crossAxisCount: 2,
+                                  itemCount: widget.snap['postUrl'].length,
+                                  itemBuilder: (context, index) =>
+                                      GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pushNamed(
+                                          SelectedImageScreen.routeName,
+                                          arguments: PassArguments(
+                                              widget.snap['postId'], index));
+                                    },
+                                    child: Image.network(
+                                      widget.snap['postUrl'][index],
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  staggeredTileBuilder: (index) =>
+                                      StaggeredTile.count(
+                                    (index % 1 == 0) ? 1 : 1,
+                                    (index % 1 == 0) ? 1 : 2,
+                                  ),
+                                  mainAxisSpacing: 2,
+                                  crossAxisSpacing: 2,
+                                ),
                     ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CommunityIcon(
-                          icon: FontAwesomeIcons.comment,
-                          count: postData.commentsCounter),
-                      CommunityIcon(
-                          icon: FontAwesomeIcons.arrowRightArrowLeft,
-                          count: postData.shareCounter),
-                      CommunityIcon(
-                          icon: FontAwesomeIcons.heart,
-                          count: postData.shareCounter),
-                      const CommunityIcon(
+                      _CommunityIcon(icon: FontAwesomeIcons.comment, count: 0),
+                      _CommunityIcon(
+                          icon: FontAwesomeIcons.arrowRightArrowLeft, count: 0),
+                      _CommunityIcon(icon: FontAwesomeIcons.heart, count: 0),
+                      const _CommunityIcon(
                         icon: FontAwesomeIcons.share,
                       ),
                       const SizedBox(
@@ -104,11 +173,18 @@ class PostWidget extends StatelessWidget {
   }
 }
 
-class CommunityIcon extends StatelessWidget {
+class PassArguments {
+  final String postId;
+  final int index;
+
+  PassArguments(this.postId, this.index);
+}
+
+class _CommunityIcon extends StatelessWidget {
   final IconData icon;
   final int? count;
   //final Function onTap;
-  const CommunityIcon({super.key, required this.icon, this.count});
+  const _CommunityIcon({super.key, required this.icon, this.count});
 
   @override
   Widget build(BuildContext context) {

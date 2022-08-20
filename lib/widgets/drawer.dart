@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/user_provider.dart';
 import '../screens/logged_screens/profile_screen.dart';
 import 'dart:developer' as devtools show log;
-
-import '../utilis/dummy_users.dart';
+import '../../utilis/user.dart' as model;
 
 class TwitterDrawer extends StatelessWidget {
   const TwitterDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final model.User user = Provider.of<UserProvider>(context).getUser;
+
     Widget usersInfo({
       required String imgUrl,
       required String name,
@@ -24,7 +26,9 @@ class TwitterDrawer extends StatelessWidget {
               Navigator.of(context).pushNamed(ProfileScreen.routeName);
             },
             child: CircleAvatar(
-                radius: 30, backgroundImage: NetworkImage(imgUrl))),
+                backgroundColor: Colors.transparent,
+                radius: 30,
+                backgroundImage: NetworkImage(imgUrl))),
         const SizedBox(
           height: 10,
         ),
@@ -78,20 +82,19 @@ class TwitterDrawer extends StatelessWidget {
       );
     }
 
-    final user = Provider.of<RandomUsers>(context);
-    final userDummy = user.dummyUsers[0];
-
     return Drawer(
         child: Padding(
       padding: const EdgeInsets.only(top: 50, left: 30),
       child: Column(
         children: [
           usersInfo(
-              imgUrl: userDummy.userImageUrl,
-              name: userDummy.userName,
-              alias: userDummy.userAlias,
-              followers: userDummy.followers,
-              following: userDummy.following),
+              imgUrl: user.photoUrl!.isEmpty
+                  ? 'https://cdn.iconscout.com/icon/premium/png-256-thumb/profile-3891967-3227614.png'
+                  : user.photoUrl.toString(),
+              name: user.username,
+              alias: user.alias,
+              followers: user.followers.length,
+              following: user.following.length),
           ListView(
             shrinkWrap: true,
             children: [

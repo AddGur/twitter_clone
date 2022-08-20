@@ -56,8 +56,7 @@ class MyApp extends StatelessWidget {
           LoginScreen.routeName: (context) => const LoginScreen(),
           MobileScreenLayout.routeName: (context) => const MobileScreenLayout(),
           NewPostScreen.routeName: (context) => const NewPostScreen(),
-          SelectedImageScreen.routeName: (context) =>
-              const SelectedImageScreen(),
+          SelectedImageScreen.routeName: (context) => const SelectedImageScreen(),
           ProfileScreen.routeName: (context) => const ProfileScreen(),
           AddEmailAdressScreen.routeName: (context) =>
               const AddEmailAdressScreen(),

@@ -1,6 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/src/rendering/sliver_persistent_header.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:twitter_clone/widgets/twitter_button.dart';
+import '../../utilis/user.dart' as model;
+import 'dart:developer' as devtools show log;
+
+import '../../providers/user_provider.dart';
+import '../../widgets/post_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const routeName = '/profileScreen';
@@ -11,13 +21,10 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>
-    with TickerProviderStateMixin {
+class _ProfileScreenState extends State<ProfileScreen> {
   var top = 0.0;
-  var userDate = {};
-
   late ScrollController _scrollController;
-  late TabController _tabController;
+  bool isHidden = false;
 
   @override
   void initState() {
@@ -26,222 +33,198 @@ class _ProfileScreenState extends State<ProfileScreen>
     _scrollController.addListener(() {
       setState(() {});
     });
-    _tabController = TabController(length: 4, vsync: this);
-    getData();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _tabController.dispose();
-  }
-
-  getData() async {
-    try {
-      var userSnap = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .get();
-
-      userDate = userSnap.data()!;
-    } catch (e) {
-      print(e.toString());
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        body: Stack(
-          children: [
-            CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                SliverAppBar(
-                  backgroundColor: top <= 150 ? Colors.blue : Colors.white,
-                  floating: false,
-                  pinned: true,
-                  snap: false,
-                  actions: [
-                    IconButton(
-                        onPressed: () {}, icon: const Icon(Icons.search)),
-                  ],
-                  expandedHeight: 320,
-                  flexibleSpace: LayoutBuilder(
-                    builder: (ctx, cons) {
-                      top = cons.biggest.height;
-                      return FlexibleSpaceBar(
-                          title: AnimatedOpacity(
-                            duration: const Duration(milliseconds: 300),
-                            opacity: top <= 150 ? 1.0 : 0.0,
-                            child: Column(children: [
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              const Text('Name'),
-                              const Text(
-                                'Tweets: 4',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ]),
-                          ),
-                          background: Column(
-                            children: [
-                              Container(
-                                height: 130,
-                                width: double.infinity,
-                                child: Image.network(
-                                  'https://media.istockphoto.com/photos/human-hologram-of-people-crowd-picture-id1177346488?k=20&m=1177346488&s=612x612&w=0&h=jQWoBlLkTF_773Avn8t_4daQA6hxlrcLmmo9sdoPb1Y=',
-                                  fit: BoxFit.cover,
+    final model.User user = Provider.of<UserProvider>(context).getUser;
+    return Scaffold(
+      body: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            return DefaultTabController(
+              length: 4,
+              child: Stack(
+                children: [
+                  CustomScrollView(controller: _scrollController, slivers: [
+                    SliverAppBar(
+                        leading: Icon(Icons.arrow_back),
+                        actions: [
+                          IconButton(
+                              onPressed: () {}, icon: Icon(Icons.search)),
+                          IconButton(onPressed: () {}, icon: Icon(Icons.abc))
+                        ],
+                        expandedHeight: 150.0,
+                        primary: true,
+                        pinned: true,
+                        flexibleSpace: LayoutBuilder(builder: (ctx, cons) {
+                          top = cons.biggest.height;
+                          return FlexibleSpaceBar(
+                            title: AnimatedOpacity(
+                              duration: Duration(milliseconds: 300),
+                              opacity: isHidden ? 1 : 0.0,
+                              child: Column(children: [
+                                SizedBox(
+                                  height: 22,
                                 ),
-                              ),
-                              SizedBox(
-                                height: 200,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                Text(
+                                  'John Doe',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                SizedBox(
+                                  height: 3,
+                                ),
+                                Text(
+                                  'followe',
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                              ]),
+                            ),
+                            background: Image.network(
+                              'https://sm.ign.com/t/ign_pl/screenshot/default/twitter-logo_uuha.1280.jpg',
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        })),
+                    SliverToBoxAdapter(
+                        child: Stack(
+                      clipBehavior: Clip.hardEdge,
+                      children: [
+                        Container(
+                            width: double.infinity,
+                            height: 200,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 15),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: TwitterButton(
+                                          onPressed: () {},
+                                          buttonsText: 'Edit profile',
+                                          backgroundColor: Colors.white,
+                                          textColor: Colors.black),
+                                    ),
+                                    Text(
+                                      user.username,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
+                                    Text(
+                                      '@${user.alias}',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 18,
+                                          color: Colors.grey),
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Row(
                                       children: [
-                                        Align(
-                                          alignment: Alignment.topRight,
-                                          child: ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.white,
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20))),
-                                              onPressed: () {},
-                                              child: const Text(
-                                                'Edytuj profil',
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 12,
-                                                    fontWeight:
-                                                        FontWeight.w400),
-                                              )),
+                                        Icon(
+                                          FontAwesomeIcons.baby,
+                                          size: 18,
                                         ),
-                                        const Text(
-                                          'Name',
+                                        Text(
+                                          ' Born ${user.birthday}',
                                           style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20),
+                                              fontWeight: FontWeight.w400),
                                         ),
-                                        const Text(
-                                          '@allias',
-                                          style: TextStyle(
-                                              color: Colors.grey, fontSize: 15),
+                                        SizedBox(
+                                          width: 5,
                                         ),
-                                        const SizedBox(
-                                          height: 10,
+                                        Icon(
+                                          FontAwesomeIcons.calendarDay,
+                                          size: 18,
                                         ),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.local_hospital_outlined,
-                                              size: 15,
-                                            ),
-                                            const Text(
-                                              'Urodziny: 11 czerwaca 2004',
-                                              style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontSize: 15),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.calendar_month,
-                                              size: 15,
-                                            ),
-                                            const Text(
-                                              'Dołączył/a czerwiec 2004',
-                                              style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontSize: 15),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            const Text(
-                                              '3 Obserwowani 0 Obserwowani',
-                                              style: TextStyle(
-                                                  color: Colors.grey,
-                                                  fontSize: 15),
-                                            ),
-                                          ],
-                                        ),
-                                      ]),
-                                ),
-                              )
-                            ],
-                          ));
-                    },
-                  ),
-                  bottom: TabBar(
-                      labelColor: Colors.black,
-                      unselectedLabelColor: Colors.grey,
-                      controller: _tabController,
-                      isScrollable: true,
-                      tabs: [
-                        const Tab(
-                          text: 'Tweety',
+                                        Text(' Joined ${user.joined}',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w400)),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    Row(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            print(isHidden.toString());
+                                          },
+                                          child: Text(
+                                            '${user.following.length} Following   ${user.followers.length} Followers',
+                                            style: TextStyle(fontSize: 15),
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                  ]),
+                            )),
+                        Positioned(
+                            top: 11,
+                            left: 55,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white,
+                              radius: 20,
+                              child: CircleAvatar(
+                                radius: 18.4,
+                                backgroundColor: Colors.blue,
+                                backgroundImage: NetworkImage(user.photoUrl!),
+                              ),
+                            ))
+                      ],
+                    )),
+                    SliverPersistentHeader(
+                      delegate: _SliverAppBarDelegate(
+                        TabBar(
+                          labelPadding: EdgeInsets.symmetric(horizontal: 5.0),
+                          indicatorSize: TabBarIndicatorSize.label,
+                          labelColor: Colors.black,
+                          unselectedLabelColor: Colors.grey,
+                          tabs: [
+                            Tab(text: 'Tweets'),
+                            Tab(text: 'Tweets & replies'),
+                            Tab(text: 'Media'),
+                            Tab(text: 'Likes'),
+                          ],
                         ),
-                        const Tab(
-                          text: 'Tweety i odpowiedzi',
-                        ),
-                        const Tab(
-                          text: 'Multimedia',
-                        ),
-                        const Tab(
-                          text: 'Polubienia',
-                        ),
-                      ]),
-                ),
-                SliverToBoxAdapter(
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 1000,
-                        width: double.maxFinite,
-                        child:
-                            TabBarView(controller: _tabController, children: [
-                          ListView.builder(
-                            itemBuilder: (context, index) {
-                              return const ListTile(
-                                leading: CircleAvatar(radius: 10),
-                                title: Text('Title'),
-                              );
-                            },
-                            itemCount: 50,
-                          ),
-                          const Text('Tweett and answer'),
-                          const Text('Multi'),
-                          const Text('Multi'),
-                        ]),
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            _avatar(),
-          ],
-        ),
-      ),
+                      pinned: true,
+                    ),
+                    SliverFixedExtentList(
+                        delegate: SliverChildListDelegate([
+                          ListView.builder(
+                            itemCount: snapshot.data!.docs.length,
+                            itemBuilder: (context, index) => PostWidget(
+                              snap: snapshot.data!.docs[index].data(),
+                            ),
+                          ),
+                        ]),
+                        itemExtent: 300)
+                  ]),
+                  _buildFab(isHidden, user.photoUrl!),
+                ],
+              ),
+            );
+          }),
     );
   }
 
-  Widget _avatar() {
-    const double defaultMargin = 90;
-    const double defaultStart = 80;
-    const double defaultEnd = defaultStart / 2;
+  Widget _buildFab(bool isHidden, String imgUrl) {
+    final double defaultMargin = 160;
+    final double defaultStart = 130;
+    final double defaultEnd = defaultStart / 2;
 
     double top = defaultMargin;
     double scale = 1.0;
@@ -249,28 +232,68 @@ class _ProfileScreenState extends State<ProfileScreen>
     if (_scrollController.hasClients) {
       double offset = _scrollController.offset;
       top -= offset;
+      devtools.log('OFFSET ${offset.toString()}');
+      devtools.log('TOP ${top.toString()}');
 
       if (offset < defaultMargin - defaultStart) {
         scale = 1.0;
       } else if (offset < defaultStart - defaultEnd) {
         scale = (defaultMargin - defaultEnd - offset) / defaultEnd;
+        devtools.log('SCALE ${scale.toString()}');
+      } else if (offset > 105) {
+        scale = 0;
       } else {
-        scale = 0.0;
+        scale = 0.4;
+      }
+
+      if (offset > 165) {
+        setState(() {
+          isHidden = true;
+        });
+      } else {
+        setState(() {
+          isHidden = false;
+        });
       }
     }
-
     return Positioned(
-      top: top,
-      left: 20,
-      child: Transform(
-        transform: Matrix4.identity()..scale(scale),
-        child: CircleAvatar(
-          backgroundImage: NetworkImage(
-            userDate['photoUrl'],
-          ),
-          radius: 35,
-        ),
-      ),
-    );
+        top: top - 35,
+        left: 25,
+        child: Transform(
+            alignment: Alignment.bottomCenter,
+            transform: Matrix4.identity()..scale(scale),
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              radius: 50,
+              child: CircleAvatar(
+                  radius: 46,
+                  backgroundColor: Colors.blue,
+                  backgroundImage: NetworkImage(imgUrl)),
+            )));
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate(this._tabBar);
+
+  final TabBar _tabBar;
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Material(
+        child: Container(
+      child: _tabBar,
+    ));
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 }

@@ -120,15 +120,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     backgroundColor: Colors.white),
                 TwitterButton(
                     onPressed: () async {
-                      await checkEmail();
-                      isContains
-                          ? Navigator.pushReplacementNamed(
-                              context, EnterPasswordScreen.routeName,
-                              arguments: _loginController.text)
-                          : showSnackBar(
-                              'Sorry, we could not find your account.',
-                              context,
-                              30);
+                      _loginController.text.isNotEmpty
+                          ? await checkEmail()
+                          : null;
+                      _loginController.text.isNotEmpty
+                          ? isContains
+                              ? Navigator.pushReplacementNamed(
+                                  context, EnterPasswordScreen.routeName,
+                                  arguments: _loginController.text)
+                              : showSnackBar(
+                                  'Sorry, we could not find your account.',
+                                  context,
+                                  30)
+                          : null;
                     },
                     buttonsText: 'Next',
                     textColor: Colors.white,

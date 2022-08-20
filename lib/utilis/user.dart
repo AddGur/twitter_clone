@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-class Users {
+class User {
   final String email;
   final String? phoneNumber;
   final String username;
   final String birthday;
+  final String joined;
   final String uid;
   final String alias;
   final String? photoUrl;
@@ -13,11 +14,12 @@ class Users {
   final List followers;
   final List following;
 
-  Users(
+  User(
       {required this.email,
       this.phoneNumber,
       required this.username,
       required this.birthday,
+      required this.joined,
       required this.uid,
       required this.alias,
       this.photoUrl,
@@ -25,12 +27,13 @@ class Users {
       required this.followers,
       required this.following});
 
-  static Users fromSnap(DocumentSnapshot snap) {
+  static User fromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
-    return Users(
+    return User(
       email: snapshot["email"],
       username: snapshot["username"],
       birthday: snapshot["birthday"],
+      joined: snapshot["joined"],
       uid: snapshot["uid"],
       alias: snapshot["alias"],
       photoUrl: snapshot["photoUrl"],
@@ -45,6 +48,7 @@ class Users {
         "phoneNumer": phoneNumber,
         "username": username,
         "birthday": birthday,
+        "joined": joined,
         "alias": alias,
         "uid": uid,
         "photoUrl": photoUrl,
