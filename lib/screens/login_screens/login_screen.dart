@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           : null;
                       _loginController.text.isNotEmpty
                           ? isContains
-                              ? Navigator.pushReplacementNamed(
+                              ? Navigator.pushNamed(
                                   context, EnterPasswordScreen.routeName,
                                   arguments: _loginController.text)
                               : showSnackBar(

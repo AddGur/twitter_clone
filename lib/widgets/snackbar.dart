@@ -5,7 +5,7 @@ showSnackBar(String content, BuildContext context, double margin) {
     SnackBar(
       behavior: SnackBarBehavior.floating,
       margin: EdgeInsets.only(bottom: 75, left: margin, right: margin),
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: 3),
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(30))),
       content: Row(

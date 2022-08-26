@@ -115,10 +115,8 @@ class _AddProfilePictureScreenState extends State<AddProfilePictureScreen> {
                   TwitterButton(
                       onPressed: () async {
                         Navigator.pushNamed(
-                            context, AddDescriptionScreen.routeName);
-                        userData.photoUrl = await StroageMethods()
-                            .uploadImageToStorage('profilePics', _file!, false);
-                        devtools.log(userData.photoUrl);
+                            context, AddDescriptionScreen.routeName,
+                            arguments: _file!);
                       },
                       buttonsText: 'Next',
                       textColor: Colors.black,
@@ -132,10 +130,8 @@ class _AddProfilePictureScreenState extends State<AddProfilePictureScreen> {
 
   pickImage(ImageSource source) async {
     final ImagePicker _imagePicker = ImagePicker();
-    XFile? _file = await _imagePicker.pickImage(source: source);
+    XFile? _file = await _imagePicker.pickImage(source: source, maxWidth: 600);
     if (_file != null) {
-      devtools.log(_file.name);
-      devtools.log('a');
       return await _file.readAsBytes();
     }
   }

@@ -9,11 +9,10 @@ class Post {
   final String postId;
   final datePublished;
   final List<String>? postUrl;
-
   final String profImage;
   final likes;
   final shares;
-  final comments;
+  final List<String> comments;
 
   const Post({
     required this.description,

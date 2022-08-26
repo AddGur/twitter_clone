@@ -1,34 +1,66 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/src/rendering/sliver_persistent_header.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:twitter_clone/widgets/twitter_button.dart';
-import '../../utilis/user.dart' as model;
 import 'dart:developer' as devtools show log;
 
-import '../../providers/user_provider.dart';
 import '../../widgets/post_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const routeName = '/profileScreen';
+  final String uid;
 
-  const ProfileScreen({super.key});
+  const ProfileScreen({super.key, required this.uid});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen>
+    with TickerProviderStateMixin {
   var top = 0.0;
   late ScrollController _scrollController;
+  late TabController _tabController;
   bool isHidden = false;
+  var userDate = {};
+  int postLen = 0;
+  int followers = 0;
+  int following = 0;
+  bool isFollowing = false;
+  bool isLoading = false;
+
+  getData() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      var userSnap = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.uid)
+          .get();
+
+      userDate = userSnap.data()!;
+      followers = userSnap.data()!['followers'].length;
+      following = userSnap.data()!['following'].length;
+
+      setState(() {});
+    } catch (e) {
+      print(
+        e.toString(),
+      );
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    getData();
+    _tabController = TabController(length: 4, vsync: this);
     _scrollController = ScrollController();
     _scrollController.addListener(() {
       setState(() {});
@@ -37,28 +69,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final model.User user = Provider.of<UserProvider>(context).getUser;
-    return Scaffold(
-      body: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('posts').snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-
-            return DefaultTabController(
+    return isLoading
+        ? const Center(
+            child: CircularProgressIndicator(),
+          )
+        : Scaffold(
+            body: DefaultTabController(
               length: 4,
               child: Stack(
                 children: [
                   CustomScrollView(controller: _scrollController, slivers: [
                     SliverAppBar(
-                        leading: Icon(Icons.arrow_back),
+                        leading: IconButton(
+                            onPressed: Navigator.of(context).pop,
+                            icon: const Icon(Icons.arrow_back)),
                         actions: [
                           IconButton(
-                              onPressed: () {}, icon: Icon(Icons.search)),
-                          IconButton(onPressed: () {}, icon: Icon(Icons.abc))
+                              onPressed: () {}, icon: const Icon(Icons.search)),
+                          IconButton(
+                              onPressed: () {}, icon: const Icon(Icons.abc))
                         ],
                         expandedHeight: 150.0,
                         primary: true,
@@ -67,9 +96,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           top = cons.biggest.height;
                           return FlexibleSpaceBar(
                             title: AnimatedOpacity(
-                              duration: Duration(milliseconds: 300),
+                              duration: const Duration(milliseconds: 300),
                               opacity: isHidden ? 1 : 0.0,
-                              child: Column(children: [
+                              child: Column(children: const [
                                 SizedBox(
                                   height: 22,
                                 ),
@@ -96,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Stack(
                       clipBehavior: Clip.hardEdge,
                       children: [
-                        Container(
+                        SizedBox(
                             width: double.infinity,
                             height: 200,
                             child: Padding(
@@ -115,58 +144,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           textColor: Colors.black),
                                     ),
                                     Text(
-                                      user.username,
-                                      style: TextStyle(
+                                      userDate['username'],
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 20),
                                     ),
                                     Text(
-                                      '@${user.alias}',
-                                      style: TextStyle(
+                                      '@${userDate['alias']}',
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.w600,
                                           fontSize: 18,
                                           color: Colors.grey),
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     Row(
                                       children: [
-                                        Icon(
+                                        const Icon(
                                           FontAwesomeIcons.baby,
                                           size: 18,
                                         ),
                                         Text(
-                                          ' Born ${user.birthday}',
-                                          style: TextStyle(
+                                          ' Born ${userDate['birthday']}',
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.w400),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           width: 5,
                                         ),
-                                        Icon(
+                                        const Icon(
                                           FontAwesomeIcons.calendarDay,
                                           size: 18,
                                         ),
-                                        Text(' Joined ${user.joined}',
-                                            style: TextStyle(
+                                        Text(' Joined ${userDate['joined']}',
+                                            style: const TextStyle(
                                                 fontWeight: FontWeight.w400)),
                                       ],
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 20,
                                     ),
                                     Row(
                                       children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            print(isHidden.toString());
-                                          },
-                                          child: Text(
-                                            '${user.following.length} Following   ${user.followers.length} Followers',
-                                            style: TextStyle(fontSize: 15),
-                                          ),
-                                        )
+                                        Text(
+                                          '$following Following   $followers Followers',
+                                          style: const TextStyle(fontSize: 15),
+                                        ),
                                       ],
                                     )
                                   ]),
@@ -180,7 +204,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               child: CircleAvatar(
                                 radius: 18.4,
                                 backgroundColor: Colors.blue,
-                                backgroundImage: NetworkImage(user.photoUrl!),
+                                backgroundImage:
+                                    NetworkImage(userDate['photoUrl']),
                               ),
                             ))
                       ],
@@ -188,11 +213,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SliverPersistentHeader(
                       delegate: _SliverAppBarDelegate(
                         TabBar(
-                          labelPadding: EdgeInsets.symmetric(horizontal: 5.0),
+                          controller: _tabController,
+                          labelPadding:
+                              const EdgeInsets.symmetric(horizontal: 5.0),
                           indicatorSize: TabBarIndicatorSize.label,
                           labelColor: Colors.black,
                           unselectedLabelColor: Colors.grey,
-                          tabs: [
+                          tabs: const [
                             Tab(text: 'Tweets'),
                             Tab(text: 'Tweets & replies'),
                             Tab(text: 'Media'),
@@ -202,29 +229,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       pinned: true,
                     ),
-                    SliverFixedExtentList(
-                        delegate: SliverChildListDelegate([
-                          ListView.builder(
-                            itemCount: snapshot.data!.docs.length,
-                            itemBuilder: (context, index) => PostWidget(
-                              snap: snapshot.data!.docs[index].data(),
-                            ),
+                    SliverToBoxAdapter(
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height / 2,
+                            width: double.maxFinite,
+                            child: TabBarView(
+                                controller: _tabController,
+                                children: [
+                                  StreamBuilder(
+                                      stream: FirebaseFirestore.instance
+                                          .collection('posts')
+                                          .where('uid', isEqualTo: widget.uid)
+                                          .snapshots(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        }
+                                        return ListView.builder(
+                                          physics:
+                                              const AlwaysScrollableScrollPhysics(),
+                                          itemCount: (snapshot.data! as dynamic)
+                                              .docs
+                                              .length,
+                                          itemBuilder: (context, index) {
+                                            return PostWidget(
+                                                snap:
+                                                    (snapshot.data! as dynamic)
+                                                        .docs[index]
+                                                        .data());
+                                          },
+                                        );
+                                      }),
+                                  const Text('Tweett and answer'),
+                                  const Text('Multi'),
+                                  const Text('Multi'),
+                                ]),
                           ),
-                        ]),
-                        itemExtent: 300)
+                        ],
+                      ),
+                    ),
                   ]),
-                  _buildFab(isHidden, user.photoUrl!),
+                  _buildFab(isHidden, userDate['photoUrl']),
                 ],
               ),
-            );
-          }),
-    );
+            ),
+            //     }),
+          );
   }
 
   Widget _buildFab(bool isHidden, String imgUrl) {
-    final double defaultMargin = 160;
-    final double defaultStart = 130;
-    final double defaultEnd = defaultStart / 2;
+    const double defaultMargin = 160;
+    const double defaultStart = 130;
+    const double defaultEnd = defaultStart / 2;
 
     double top = defaultMargin;
     double scale = 1.0;
@@ -232,14 +293,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_scrollController.hasClients) {
       double offset = _scrollController.offset;
       top -= offset;
-      devtools.log('OFFSET ${offset.toString()}');
-      devtools.log('TOP ${top.toString()}');
 
       if (offset < defaultMargin - defaultStart) {
         scale = 1.0;
       } else if (offset < defaultStart - defaultEnd) {
         scale = (defaultMargin - defaultEnd - offset) / defaultEnd;
-        devtools.log('SCALE ${scale.toString()}');
       } else if (offset > 105) {
         scale = 0;
       } else {

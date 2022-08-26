@@ -1,6 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:twitter_clone/responsive/responsive_layout_screen.dart';
+import 'package:twitter_clone/screens/logged_screens/home_screen.dart';
+import 'package:twitter_clone/screens/logged_screens/new_comment_fullscreen.dart';
+import 'package:twitter_clone/screens/logged_screens/tweet_screen.dart';
 import 'package:twitter_clone/screens/login_screens/enter_password_screen.dart';
 import 'package:twitter_clone/providers/user_provider.dart';
 import 'screens/login_screens/login_screen.dart';
@@ -17,10 +22,8 @@ import '../screens/logged_screens/profile_screen.dart';
 import '../screens/logged_screens/selected_image_screen.dart';
 import '../screens/main_screen.dart';
 import 'screens/signin_screens/add_first_data_screen.dart';
-import '../utilis/dummy_users.dart';
 
 import 'screens/signin_screens/add_profile_picture_screen.dart';
-import 'utilis/dummy_posts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,10 +40,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (ctx) => Posts()),
         ChangeNotifierProvider(create: (ctx) => IsCommentEmpty()),
         ChangeNotifierProvider(create: (ctx) => NewUser()),
-        ChangeNotifierProvider(create: (ctx) => RandomUsers()),
         ChangeNotifierProvider(create: (ctx) => UserProvider()),
       ],
       child: MaterialApp(
@@ -48,7 +49,28 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const MainLoginScreen(),
+        home: StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.active) {
+              if (snapshot.hasData) {
+                return const ResponsiveLayout(
+                  mobileScreenLayout: MobileScreenLayout(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text('${snapshot.error}'),
+                );
+              }
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return const MainLoginScreen();
+          },
+        ),
         debugShowCheckedModeBanner: false,
         routes: {
           AddFirstDataScreen.routeName: (context) => const AddFirstDataScreen(),
@@ -56,8 +78,8 @@ class MyApp extends StatelessWidget {
           LoginScreen.routeName: (context) => const LoginScreen(),
           MobileScreenLayout.routeName: (context) => const MobileScreenLayout(),
           NewPostScreen.routeName: (context) => const NewPostScreen(),
-          SelectedImageScreen.routeName: (context) => const SelectedImageScreen(),
-          ProfileScreen.routeName: (context) => const ProfileScreen(),
+          SelectedImageScreen.routeName: (context) =>
+              const SelectedImageScreen(),
           AddEmailAdressScreen.routeName: (context) =>
               const AddEmailAdressScreen(),
           AddPasswordScreen.routeName: (context) => const AddPasswordScreen(),
@@ -68,6 +90,7 @@ class MyApp extends StatelessWidget {
           AddAliasScreen.routeName: (context) => const AddAliasScreen(),
           EnterPasswordScreen.routeName: (context) =>
               const EnterPasswordScreen(),
+          TweetScreen.routeName: (context) => const TweetScreen(),
         },
       ),
     );

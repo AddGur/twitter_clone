@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -28,6 +29,7 @@ class _AddAliasScreenState extends State<AddAliasScreen> {
   late TextEditingController _alias;
   var randNumb = Random().nextInt(900000) + 100000;
   var randName;
+  Uint8List? _file;
   bool _aliasExists = false;
 
   @override
@@ -64,14 +66,13 @@ class _AddAliasScreenState extends State<AddAliasScreen> {
         phoneNumber: '',
         birthday: userData.birthday,
         joined: DateFormat.yMMMM().format(DateTime.now()),
-        file: userData.photoUrl);
+        file: _file!);
     if (res != 'success') {
       showSnackBar('err', context, 30);
-      devtools.log("dupa");
     } else {
       await addData();
 
-      Navigator.pushNamed(context, MobileScreenLayout.routeName);
+      await Navigator.pushNamed(context, MobileScreenLayout.routeName);
     }
   }
 
@@ -97,6 +98,8 @@ class _AddAliasScreenState extends State<AddAliasScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _file = ModalRoute.of(context)!.settings.arguments as Uint8List;
+
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(

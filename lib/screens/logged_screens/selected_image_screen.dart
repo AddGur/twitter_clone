@@ -12,8 +12,10 @@ import 'package:palette_generator/palette_generator.dart';
 import 'package:swipe/swipe.dart';
 import 'package:twitter_clone/resources/firestore_methods.dart';
 import 'package:twitter_clone/widgets/post_widget.dart';
+import 'package:twitter_clone/widgets/social_bar_widget.dart';
 import 'dart:developer' as devtools show log;
-import '../../utilis/dummy_posts.dart';
+
+import '../../widgets/comment_widget.dart';
 
 class SelectedImageScreen extends StatefulWidget {
   static const routeName = '/selectedImageScreen';
@@ -93,70 +95,48 @@ class _SelectedImageScreenState extends State<SelectedImageScreen> {
                     ),
                     backgroundColor:
                         colors.isNotEmpty ? colors[index].color : Colors.white,
-                    body: Column(
-                      children: [
-                        Expanded(
-                          child: Container(),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            hideBar();
-                            isBarHidden = !isBarHidden;
-                          },
-                          child: Container(
-                            height: MediaQuery.of(context).size.height / 2,
-                            decoration: BoxDecoration(
-                                color: colors.isNotEmpty
-                                    ? colors[index].color
-                                    : Colors.white,
-                                image: DecorationImage(
-                                    image: NetworkImage(imgUrl[index]),
-                                    fit: BoxFit.cover)),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _CommunityIcon(
-                                  icon: FontAwesomeIcons.comment, count: 0),
-                              _CommunityIcon(
-                                  icon: FontAwesomeIcons.arrowRightArrowLeft,
-                                  count: 0),
-                              _CommunityIcon(
-                                  icon: FontAwesomeIcons.heart, count: 0),
-                              const _CommunityIcon(
-                                icon: FontAwesomeIcons.share,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Padding(
-                          padding: const EdgeInsets.only(
-                              bottom: 10, left: 10, right: 10),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Tweet your reply',
-                              hintStyle: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w300),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
-                              ),
-                              border: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                    body: SingleChildScrollView(
+                      child: Container(
+                        height: MediaQuery.of(context).size.height -
+                            AppBar().preferredSize.height -
+                            50,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Container(),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                hideBar();
+                                isBarHidden = !isBarHidden;
+                              },
+                              child: Container(
+                                height: MediaQuery.of(context).size.height / 2,
+                                decoration: BoxDecoration(
+                                    color: colors.isNotEmpty
+                                        ? colors[index].color
+                                        : Colors.white,
+                                    image: DecorationImage(
+                                        image: NetworkImage(imgUrl[index]),
+                                        fit: BoxFit.cover)),
                               ),
                             ),
-                          ),
-                        )
-                      ],
+                            Expanded(
+                              child: Container(),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              child: SocialBarWidget(
+                                postId: postId,
+                                color: Colors.white,
+                                isPostScreen: false,
+                                isTweetScreen: false,
+                              ),
+                            ),
+                            CommentWidget(postId: postId),
+                          ],
+                        ),
+                      ),
                     ),
                   );
                 },
@@ -164,43 +144,6 @@ class _SelectedImageScreenState extends State<SelectedImageScreen> {
             }
         }
       },
-    );
-  }
-}
-
-class _CommunityIcon extends StatelessWidget {
-  final IconData icon;
-  final int? count;
-  //final Function onTap;
-  const _CommunityIcon({super.key, required this.icon, this.count});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: GestureDetector(
-        onTap: () {},
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: Colors.white,
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            if (count != null)
-              Text(
-                count.toString(),
-                style: const TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 20,
-                    color: Colors.white),
-              ),
-          ],
-        ),
-      ),
     );
   }
 }

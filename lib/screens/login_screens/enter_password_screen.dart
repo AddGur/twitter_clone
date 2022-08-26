@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:twitter_clone/resources/auth_method.dart';
+import 'package:twitter_clone/responsive/responsive_layout_screen.dart';
 
 import '../../../utilis/user.dart';
 
@@ -36,11 +37,12 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
     _password = TextEditingController();
   }
 
-  addData() async {
-    UserProvider _userProvider =
-        Provider.of<UserProvider>(context, listen: false);
-    await _userProvider.refreshUser();
-  }
+  // addData() async {
+  //   UserProvider _userProvider =
+  //       Provider.of<UserProvider>(context, listen: false);
+  //   await _userProvider.refreshUser();
+  //   Navigator.pushNamed(context, MobileScreenLayout.routeName);
+  // }
 
   @override
   void dispose() {
@@ -49,15 +51,17 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
   }
 
   void loginUser() async {
-    try {
-      String res = await AuthMethod()
-          .loginUser(email: email, password: _password.text, context: context);
-      if (res == 'success') {
-        await addData();
-
-        Navigator.pushNamed(context, MobileScreenLayout.routeName);
-      }
-    } on FirebaseAuthException catch (e) {
+    String res =
+        await AuthMethod().loginUser(email: email, password: _password.text);
+    if (res == 'success') {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const ResponsiveLayout(
+            mobileScreenLayout: MobileScreenLayout(),
+          ),
+        ),
+      );
+    } else {
       showSnackBar('Wrong password!', context, 100);
     }
   }

@@ -4,19 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
 
-class StroageMethods {
+class StorageMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  Future<String> uploadImageToStorage(
-      String childName, Uint8List file, bool isPost) async {
+  Future<String> uploadImageToStorage(String childName, Uint8List file) async {
     Reference ref =
         _storage.ref().child(childName).child(_auth.currentUser!.uid);
-
-    if (isPost) {
-      String id = const Uuid().v1();
-      ref = ref.child(id);
-    }
 
     UploadTask uploadTask = ref.putData(file);
 

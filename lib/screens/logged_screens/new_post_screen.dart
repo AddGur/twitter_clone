@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -19,28 +21,6 @@ class NewPostScreen extends StatefulWidget {
 }
 
 class _NewPostScreenState extends State<NewPostScreen> {
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: Text('a'),
-  //     ),
-  //     body: Column(
-  //       children: [
-  //         ElevatedButton(
-  //           onPressed: selectImages,
-  //           child: Text('dupa'),
-  //         ),
-  //         ElevatedButton(
-  //             onPressed: () => uploadFiles(_imageFileList), child: Text('up')),
-  //         ElevatedButton(
-  //             onPressed: () => print(_imageFileList.length.toString()),
-  //             child: Text('print'))
-  //       ],
-  //     ),
-  //   );
-  // }
-
   late TextEditingController _tweetController;
 
   final ImagePicker _picker = ImagePicker();
@@ -110,10 +90,11 @@ class _NewPostScreenState extends State<NewPostScreen> {
             Expanded(
               child:
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 8),
                   child: CircleAvatar(
                     radius: 15,
+                    backgroundImage: NetworkImage(_user.photoUrl!),
                     backgroundColor: Colors.red,
                   ),
                 ),
@@ -217,15 +198,15 @@ class _NewPostScreenState extends State<NewPostScreen> {
             const Divider(),
             GestureDetector(
                 onTap: () {},
-                child: Row(children: [
-                  const Icon(
+                child: Row(children: const [
+                  Icon(
                     Icons.public,
                     color: Colors.blue,
                   ),
-                  const SizedBox(
+                  SizedBox(
                     width: 10,
                   ),
-                  const Text(
+                  Text(
                     'Everyone can reply',
                     style: TextStyle(color: Colors.blue),
                   ),
@@ -283,7 +264,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
   }
 
   void selectImages() async {
-    var selectedImage = await _picker.pickImage(source: ImageSource.gallery);
+    var selectedImage =
+        await _picker.pickImage(source: ImageSource.gallery, maxWidth: 600);
     if (selectedImage == null) {
       return;
     }
@@ -303,15 +285,13 @@ class _NewPostScreenState extends State<NewPostScreen> {
     }
     setState(() {
       var img = File(takenPicture.path);
-
       _imageFileList.add(img);
-      devtools.log(img.toString());
     });
   }
 
   void postTweet(
       String uid, String username, String profImage, String alias) async {
-    String res = await FirestoreMethods().uploadPost(
+    await FirestoreMethods().uploadPost(
         _tweetController.text, _imageFileList, uid, username, alias, profImage);
     Navigator.pop(context);
   }

@@ -8,12 +8,12 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:twitter_clone/resources/auth_method.dart';
+import 'package:twitter_clone/screens/logged_screens/tweet_screen.dart';
 
 import '../../providers/user_provider.dart';
 import '../../utilis/user.dart' as model;
 import '../logged_screens/new_post_screen.dart';
 import '../logged_screens/selected_image_screen.dart';
-import 'package:twitter_clone/utilis/dummy_posts.dart';
 import 'package:twitter_clone/widgets/drawer.dart';
 import 'package:twitter_clone/widgets/post_widget.dart';
 
@@ -35,12 +35,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final model.User user = Provider.of<UserProvider>(context).getUser;
-    final posts = Provider.of<Posts>(context);
 
     return Scaffold(
         backgroundColor: Colors.white,
         body: StreamBuilder(
-            stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+            stream: FirebaseFirestore.instance
+                .collection('posts')
+                .orderBy('datePublished', descending: true)
+                .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
@@ -63,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.only(left: 10),
                       child: Builder(builder: (context) {
                         return GestureDetector(
-                          onDoubleTap: () => AuthMethod().logoutUser(),
                           onTap: () => Scaffold.of(context).openDrawer(),
                           child: CircleAvatar(
                             backgroundColor: Colors.transparent,
@@ -88,11 +89,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (BuildContext context, int index) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
                         return snapshot.data!.docs.length > 0
                             ? PostWidget(
                                 snap: snapshot.data!.docs[index].data())
-                            : Center(
-                                child: Text('Add post'),
+                            : const Center(
+                                child: Text(
+                                  'Add post',
+                                  style: TextStyle(fontSize: 20),
+                                ),
                               );
                       },
                       childCount: snapshot.data!.docs.length,

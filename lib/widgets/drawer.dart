@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:twitter_clone/resources/auth_method.dart';
+import 'package:twitter_clone/screens/login_screens/login_screen.dart';
+import 'package:twitter_clone/screens/main_screen.dart';
 
 import '../providers/user_provider.dart';
 import '../screens/logged_screens/profile_screen.dart';
@@ -23,7 +26,10 @@ class TwitterDrawer extends StatelessWidget {
       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         GestureDetector(
             onTap: () {
-              Navigator.of(context).pushNamed(ProfileScreen.routeName);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (context) => ProfileScreen(uid: user.uid)),
+              );
             },
             child: CircleAvatar(
                 backgroundColor: Colors.transparent,
@@ -143,7 +149,11 @@ class TwitterDrawer extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onTap: () => devtools.log('settings'),
+                onTap: () async {
+                  await AuthMethod().logoutUser();
+                  Navigator.pushReplacementNamed(
+                      context, MainLoginScreen.routeName);
+                },
                 child: const ListTile(
                   visualDensity: VisualDensity(horizontal: -2, vertical: -4),
                   leading: Text('Help Centre'),

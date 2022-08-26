@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:path/path.dart';
+import 'package:twitter_clone/resources/storage_methods.dart';
 import '../utilis/user.dart' as model;
+// ignore: unused_import
 import 'dart:developer' as devtools show log;
-
-import '../widgets/snackbar.dart';
+import 'dart:typed_data';
 
 class AuthMethod {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -27,7 +26,7 @@ class AuthMethod {
       String? phoneNumber,
       required String birthday,
       required String joined,
-      required String file,
+      required Uint8List file,
       String? discrption}) async {
     String res = "error";
 
@@ -35,14 +34,17 @@ class AuthMethod {
       UserCredential credential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
 
-      model.User _user = model.User(
+      String photoUrl =
+          await StorageMethods().uploadImageToStorage('profilePics', file);
+
+      model.User user = model.User(
         email: email,
         username: username,
         birthday: birthday,
         joined: joined,
         uid: credential.user!.uid,
         alias: alias,
-        photoUrl: file,
+        photoUrl: photoUrl,
         followers: [],
         following: [],
         discrption: discrption,
@@ -52,7 +54,7 @@ class AuthMethod {
       await _firestore
           .collection("users")
           .doc(credential.user!.uid)
-          .set(_user.toJson());
+          .set(user.toJson());
 
       res = 'success';
     } catch (err) {
@@ -64,7 +66,6 @@ class AuthMethod {
   Future<String> loginUser({
     required String email,
     required String password,
-    required BuildContext context,
   }) async {
     String res = 'error';
     try {
@@ -72,9 +73,11 @@ class AuthMethod {
         await _auth.signInWithEmailAndPassword(
             email: email, password: password);
         res = 'success';
+      } else {
+        res = 'Wrong password!';
       }
-    } on FirebaseAuthException catch (e) {
-      showSnackBar('Wrong password!', context, 100);
+      // } on FirebaseAuthException catch (e) {
+      //   showSnackBar('Wrong password!', context, 100);
     } catch (e) {
       return e.toString();
     }

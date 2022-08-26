@@ -1,3 +1,5 @@
+import 'package:file/file.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -36,6 +38,7 @@ class _AddDescriptionScreenState extends State<AddDescriptionScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = Provider.of<NewUser>(context);
+    final args = ModalRoute.of(context)!.settings.arguments as Uint8List;
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -87,19 +90,18 @@ class _AddDescriptionScreenState extends State<AddDescriptionScreen> {
                 children: [
                   TwitterButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, AddAliasScreen.routeName);
+                        Navigator.pushNamed(
+                          context,
+                          AddAliasScreen.routeName,
+                        );
                       },
                       buttonsText: 'Skip for now',
                       textColor: Colors.black,
                       backgroundColor: Colors.white),
                   TwitterButton(
                       onPressed: () {
-                        devtools.log(userData.birthday);
-                        devtools.log(userData.name);
-                        devtools.log(userData.email);
-                        devtools.log(userData.password);
-                        devtools.log(userData.photoUrl);
-                        Navigator.pushNamed(context, AddAliasScreen.routeName);
+                        Navigator.pushNamed(context, AddAliasScreen.routeName,
+                            arguments: args);
                         userData.description = _description.text;
                       },
                       buttonsText: 'Next',

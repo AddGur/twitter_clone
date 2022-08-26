@@ -20,16 +20,16 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
   @override
   void initState() {
     super.initState();
-    addData();
 
     pageController = PageController();
+    //   addData();
   }
 
-  addData() async {
-    UserProvider _userProvider =
-        Provider.of<UserProvider>(context, listen: false);
-    await _userProvider.refreshUser();
-  }
+  // addData() async {
+  //   UserProvider _userProvider =
+  //       Provider.of<UserProvider>(context, listen: false);
+  //   await _userProvider.refreshUser();
+  // }
 
   @override
   void dispose() {
@@ -50,6 +50,8 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
 
   @override
   Widget build(BuildContext context) {
+    //addData();
+
     return Scaffold(
       body: PageView(
         controller: pageController,
