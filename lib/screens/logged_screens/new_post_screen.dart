@@ -1,7 +1,5 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, unused_import
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:developer' as devtools show log;
@@ -41,7 +39,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
   @override
   Widget build(BuildContext context) {
     final IsCommentEmpty isCommentEmpty = Provider.of<IsCommentEmpty>(context);
-    final model.User _user = Provider.of<UserProvider>(context).getUser;
+    final model.User user = Provider.of<UserProvider>(context).getUser;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -65,10 +63,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                postTweet(
-                    _user.uid, _user.username, _user.photoUrl!, _user.alias);
+                postTweet(user.uid, user.username, user.photoUrl!, user.alias);
               },
-              child: const Text('Tweet'),
               style: ElevatedButton.styleFrom(
                   backgroundColor: isCommentEmpty.commentIsEmpty
                       ? Theme.of(context).primaryColor
@@ -76,6 +72,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20))),
+              child: const Text('Tweet'),
             ),
             const SizedBox(
               width: 10,
@@ -91,10 +88,10 @@ class _NewPostScreenState extends State<NewPostScreen> {
               child:
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Padding(
-                  padding: EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.only(top: 8),
                   child: CircleAvatar(
                     radius: 15,
-                    backgroundImage: NetworkImage(_user.photoUrl!),
+                    backgroundImage: NetworkImage(user.photoUrl!),
                     backgroundColor: Colors.red,
                   ),
                 ),
@@ -273,8 +270,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
       var img = File(selectedImage.path);
       _imageFileList.add(img);
     });
-
-    devtools.log(_imageFileList.length.toString());
   }
 
   void takePicture() async {

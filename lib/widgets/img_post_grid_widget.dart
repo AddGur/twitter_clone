@@ -6,13 +6,12 @@ import '../screens/logged_screens/selected_image_screen.dart';
 
 class ImgPostGridWidget extends StatefulWidget {
   final int length;
-  final String postId;
-  final List<dynamic> postUrl;
-  const ImgPostGridWidget(
-      {super.key,
-      required this.length,
-      required this.postId,
-      required this.postUrl});
+  final snap;
+  const ImgPostGridWidget({
+    super.key,
+    required this.length,
+    required this.snap,
+  });
 
   @override
   State<ImgPostGridWidget> createState() => _ImgPostGridWidgetState();
@@ -27,10 +26,10 @@ class _ImgPostGridWidgetState extends State<ImgPostGridWidget> {
           ? GestureDetector(
               onTap: () {
                 Navigator.of(context).pushNamed(SelectedImageScreen.routeName,
-                    arguments: PassArguments(widget.postId, 0));
+                    arguments: PassArguments(widget.snap, 0));
               },
               child: Image.network(
-                widget.postUrl[0],
+                widget.snap['postUrl'][0],
               ),
             )
           : widget.length == 3
@@ -44,10 +43,10 @@ class _ImgPostGridWidgetState extends State<ImgPostGridWidget> {
                     onTap: () {
                       Navigator.of(context).pushNamed(
                           SelectedImageScreen.routeName,
-                          arguments: PassArguments(widget.postId, index));
+                          arguments: PassArguments(widget.snap, index));
                     },
                     child: Image.network(
-                      widget.postUrl[index],
+                      widget.snap['postUrl'][index],
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -68,10 +67,10 @@ class _ImgPostGridWidgetState extends State<ImgPostGridWidget> {
                     onTap: () {
                       Navigator.of(context).pushNamed(
                           SelectedImageScreen.routeName,
-                          arguments: PassArguments(widget.postId, index));
+                          arguments: PassArguments(widget.snap, index));
                     },
                     child: Image.network(
-                      widget.postUrl[index],
+                      widget.snap['postUrl'][index],
                       fit: BoxFit.cover,
                     ),
                   ),

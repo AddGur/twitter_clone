@@ -36,10 +36,10 @@ class _CommentWidgetState extends State<CommentWidget> {
     final User user = Provider.of<UserProvider>(context).getUser;
 
     void postComment(String profilePic, String uid, String username,
-        String text, String postId) async {
+        String text, String postId, String alias) async {
       try {
         String res = await FirestoreMethods()
-            .postComment(postId, text, uid, username, profilePic);
+            .postComment(postId, text, uid, username, profilePic, alias);
 
         if (res == 'success') {
           showDialog(
@@ -180,7 +180,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                               borderRadius: BorderRadius.circular(30))),
                       onPressed: () async {
                         postComment(user.photoUrl!, user.uid, user.username,
-                            _commentController.text, widget.postId);
+                            _commentController.text, widget.postId, user.alias);
 
                         _commentController.clear();
                       },

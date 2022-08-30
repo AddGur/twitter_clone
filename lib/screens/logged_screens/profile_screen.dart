@@ -1,11 +1,15 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_import
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:twitter_clone/widgets/twitter_button.dart';
 import 'dart:developer' as devtools show log;
-
+import '../../providers/user_provider.dart';
+import '../../resources/firestore_methods.dart';
+import '../../utilis/user.dart' as model;
 import '../../widgets/post_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -28,8 +32,9 @@ class _ProfileScreenState extends State<ProfileScreen>
   int postLen = 0;
   int followers = 0;
   int following = 0;
-  bool isFollowing = false;
   bool isLoading = false;
+  bool isYourProfile = false;
+  bool isFollowing = false;
 
   getData() async {
     setState(() {
@@ -44,7 +49,9 @@ class _ProfileScreenState extends State<ProfileScreen>
       userDate = userSnap.data()!;
       followers = userSnap.data()!['followers'].length;
       following = userSnap.data()!['following'].length;
-
+      isFollowing = userSnap.data()!['followers'].contains(
+            FirebaseAuth.instance.currentUser!.uid,
+          );
       setState(() {});
     } catch (e) {
       print(
@@ -69,6 +76,12 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
+    final model.User user = Provider.of<UserProvider>(context).getUser;
+    if (user.uid == widget.uid) {
+      setState(() {
+        isYourProfile = true;
+      });
+    }
     return isLoading
         ? const Center(
             child: CircularProgressIndicator(),
@@ -136,13 +149,49 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: TwitterButton(
-                                          onPressed: () {},
-                                          buttonsText: 'Edit profile',
-                                          backgroundColor: Colors.white,
-                                          textColor: Colors.black),
-                                    ),
+                                        alignment: Alignment.bottomRight,
+                                        child: isYourProfile
+                                            ? TwitterButton(
+                                                onPressed: () {},
+                                                buttonsText: 'Edit profile',
+                                                backgroundColor: Colors.white,
+                                                textColor: Colors.black)
+                                            : isFollowing
+                                                ? TwitterButton(
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    buttonsText: 'Unfollow',
+                                                    textColor: Colors.black,
+                                                    onPressed: () async {
+                                                      await FirestoreMethods()
+                                                          .followUser(
+                                                        FirebaseAuth.instance
+                                                            .currentUser!.uid,
+                                                        userDate['uid'],
+                                                      );
+                                                      setState(() {
+                                                        isFollowing = false;
+                                                        followers--;
+                                                      });
+                                                    },
+                                                  )
+                                                : TwitterButton(
+                                                    buttonsText: 'Follow',
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    textColor: Colors.black,
+                                                    onPressed: () async {
+                                                      await FirestoreMethods()
+                                                          .followUser(
+                                                        FirebaseAuth.instance
+                                                            .currentUser!.uid,
+                                                        userDate['uid'],
+                                                      );
+                                                      setState(() {
+                                                        isFollowing = true;
+                                                        followers++;
+                                                      });
+                                                    })),
                                     Text(
                                       userDate['username'],
                                       style: const TextStyle(
@@ -233,7 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       child: Column(
                         children: [
                           SizedBox(
-                            height: MediaQuery.of(context).size.height / 2,
+                            height: MediaQuery.of(context).size.height,
                             width: double.maxFinite,
                             child: TabBarView(
                                 controller: _tabController,
@@ -266,8 +315,35 @@ class _ProfileScreenState extends State<ProfileScreen>
                                         );
                                       }),
                                   const Text('Tweett and answer'),
-                                  const Text('Multi'),
-                                  const Text('Multi'),
+                                  const Text('Media'),
+                                  StreamBuilder(
+                                      stream: FirebaseFirestore.instance
+                                          .collection('posts')
+                                          .where('likes',
+                                              arrayContains: widget.uid)
+                                          .snapshots(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        }
+                                        return ListView.builder(
+                                          physics:
+                                              const AlwaysScrollableScrollPhysics(),
+                                          itemCount: (snapshot.data! as dynamic)
+                                              .docs
+                                              .length,
+                                          itemBuilder: (context, index) {
+                                            return PostWidget(
+                                                snap:
+                                                    (snapshot.data! as dynamic)
+                                                        .docs[index]
+                                                        .data());
+                                          },
+                                        );
+                                      }),
                                 ]),
                           ),
                         ],

@@ -47,8 +47,8 @@ class MainLoginScreen extends StatelessWidget {
                   },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(
+                    children: const [
+                      SizedBox(
                         height: 40,
                         width: 40,
                         child: Image(
@@ -56,7 +56,7 @@ class MainLoginScreen extends StatelessWidget {
                           fit: BoxFit.scaleDown,
                         ),
                       ),
-                      const Text(
+                      Text(
                         'Continue with Google',
                         style: TextStyle(color: Colors.black),
                       ),

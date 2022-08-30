@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -49,18 +51,18 @@ class _AddPasswordScreenState extends State<AddPasswordScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'You\'ll need a password',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
-              Text(
+              const Text(
                 'Maske sure it\'s 8 characters or more.',
                 style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               TextField(
@@ -80,7 +82,7 @@ class _AddPasswordScreenState extends State<AddPasswordScreen> {
                     }
                   },
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                       labelText: 'Password',
                       suffixIcon: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -93,7 +95,7 @@ class _AddPasswordScreenState extends State<AddPasswordScreen> {
                                       _isPasswordShown = false;
                                     });
                                   },
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.visibility_off,
                                     color: Colors.green,
                                   ))
@@ -103,7 +105,7 @@ class _AddPasswordScreenState extends State<AddPasswordScreen> {
                                       _isPasswordShown = true;
                                     });
                                   },
-                                  icon: Icon(
+                                  icon: const Icon(
                                     Icons.visibility,
                                     color: Colors.red,
                                   )),
@@ -112,13 +114,13 @@ class _AddPasswordScreenState extends State<AddPasswordScreen> {
                               FontAwesomeIcons.circleExclamation,
                               color: Colors.red,
                             ),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           )
                         ],
                       ))),
               Expanded(child: Container()),
-              Divider(),
+              const Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

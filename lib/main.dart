@@ -3,8 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:twitter_clone/responsive/responsive_layout_screen.dart';
-import 'package:twitter_clone/screens/logged_screens/home_screen.dart';
-import 'package:twitter_clone/screens/logged_screens/new_comment_fullscreen.dart';
 import 'package:twitter_clone/screens/logged_screens/tweet_screen.dart';
 import 'package:twitter_clone/screens/login_screens/enter_password_screen.dart';
 import 'package:twitter_clone/providers/user_provider.dart';
@@ -18,7 +16,6 @@ import 'firebase_options.dart';
 
 import '../responsive/mobile_screen_layout.dart';
 import '../screens/logged_screens/new_post_screen.dart';
-import '../screens/logged_screens/profile_screen.dart';
 import '../screens/logged_screens/selected_image_screen.dart';
 import '../screens/main_screen.dart';
 import 'screens/signin_screens/add_first_data_screen.dart';

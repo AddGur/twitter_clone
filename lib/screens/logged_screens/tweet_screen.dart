@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import, avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
@@ -21,7 +23,7 @@ class _TweetScreenState extends State<TweetScreen> {
   bool isFocused = false;
   int commentLen = 0;
   late String postId;
-  TextEditingController _commentController = TextEditingController();
+  final TextEditingController _commentController = TextEditingController();
 
   @override
   void dispose() {
@@ -51,33 +53,30 @@ class _TweetScreenState extends State<TweetScreen> {
       appBar: AppBar(
         foregroundColor: Colors.black,
         backgroundColor: Colors.white,
-        title: Text(
+        title: const Text(
           'Tweet',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Expanded(
-          child:
-              // Column(
-              //   children: [
-              StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection('posts')
-                      .doc(postId)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    return SingleChildScrollView(
-                      child: ChoosenPostWidget(
-                        snap: snapshot.data!,
-                      ),
-                    );
-                  }),
+          child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('posts')
+                  .doc(postId)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return SingleChildScrollView(
+                  child: ChoosenPostWidget(
+                    snap: snapshot.data!,
+                  ),
+                );
+              }),
         ),
         CommentWidget(postId: postId),
         Padding(

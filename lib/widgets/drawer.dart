@@ -1,9 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:twitter_clone/resources/auth_method.dart';
-import 'package:twitter_clone/screens/login_screens/login_screen.dart';
 import 'package:twitter_clone/screens/main_screen.dart';
-
 import '../providers/user_provider.dart';
 import '../screens/logged_screens/profile_screen.dart';
 import 'dart:developer' as devtools show log;
@@ -52,22 +54,37 @@ class TwitterDrawer extends StatelessWidget {
         const SizedBox(
           height: 10,
         ),
-        Row(
-          children: [
-            Text(
-              followers.toString(),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            const Text('Folllowing'),
-            const SizedBox(
-              width: 10,
-            ),
-            Text(
-              following.toString(),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            const Text('Followers'),
-          ],
+        StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return Row(
+              children: [
+                Text(
+                  snapshot.data!['followers'].length.toString(),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                const Text('Folllowing'),
+                const SizedBox(
+                  width: 10,
+                ),
+                Text(
+                  snapshot.data!['following'].length.toString(),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                const Text('Followers'),
+              ],
+            );
+          },
         ),
         const Divider()
       ]);
@@ -91,77 +108,79 @@ class TwitterDrawer extends StatelessWidget {
     return Drawer(
         child: Padding(
       padding: const EdgeInsets.only(top: 50, left: 30),
-      child: Column(
-        children: [
-          usersInfo(
-              imgUrl: user.photoUrl!.isEmpty
-                  ? 'https://cdn.iconscout.com/icon/premium/png-256-thumb/profile-3891967-3227614.png'
-                  : user.photoUrl.toString(),
-              name: user.username,
-              alias: user.alias,
-              followers: user.followers.length,
-              following: user.following.length),
-          ListView(
-            shrinkWrap: true,
-            children: [
-              buildMenuItem(
-                text: 'Profile',
-                icon: Icons.person_outline,
-                onTap: () => devtools.log('profile'),
-              ),
-              buildMenuItem(
-                text: 'Lists',
-                icon: Icons.list_alt,
-                onTap: () => devtools.log('lists'),
-              ),
-              buildMenuItem(
-                text: 'Topics',
-                icon: Icons.add_comment_outlined,
-                onTap: () => devtools.log('topic'),
-              ),
-              buildMenuItem(
-                text: 'Bookmarks',
-                icon: Icons.bookmark,
-                onTap: () => devtools.log('bookmarks'),
-              ),
-              buildMenuItem(
-                text: 'Moments',
-                icon: Icons.light_mode_outlined,
-                onTap: () => devtools.log('moments'),
-              ),
-              buildMenuItem(
-                text: 'Monetisation',
-                icon: Icons.money_rounded,
-                onTap: () => devtools.log('monetisation'),
-              ),
-              const Divider(),
-              buildMenuItem(
-                text: 'Twitter for Professionals',
-                icon: Icons.rocket,
-                onTap: () => devtools.log('Twitter for professionals'),
-              ),
-              const Divider(),
-              GestureDetector(
-                onTap: () => devtools.log('settings and privacy'),
-                child: const ListTile(
-                  visualDensity: VisualDensity(horizontal: -2, vertical: -4),
-                  leading: Text('Setting and privacy'),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            usersInfo(
+                imgUrl: user.photoUrl!.isEmpty
+                    ? 'https://cdn.iconscout.com/icon/premium/png-256-thumb/profile-3891967-3227614.png'
+                    : user.photoUrl.toString(),
+                name: user.username,
+                alias: user.alias,
+                followers: user.followers.length,
+                following: user.following.length),
+            ListView(
+              shrinkWrap: true,
+              children: [
+                buildMenuItem(
+                  text: 'Profile',
+                  icon: Icons.person_outline,
+                  onTap: () => devtools.log('profile'),
                 ),
-              ),
-              GestureDetector(
-                onTap: () async {
-                  await AuthMethod().logoutUser();
-                  Navigator.pushReplacementNamed(
-                      context, MainLoginScreen.routeName);
-                },
-                child: const ListTile(
-                  visualDensity: VisualDensity(horizontal: -2, vertical: -4),
-                  leading: Text('Help Centre'),
+                buildMenuItem(
+                  text: 'Lists',
+                  icon: Icons.list_alt,
+                  onTap: () => devtools.log('lists'),
                 ),
-              ),
-            ],
-          ),
-        ],
+                buildMenuItem(
+                  text: 'Topics',
+                  icon: Icons.add_comment_outlined,
+                  onTap: () => devtools.log('topic'),
+                ),
+                buildMenuItem(
+                  text: 'Bookmarks',
+                  icon: Icons.bookmark,
+                  onTap: () => devtools.log('bookmarks'),
+                ),
+                buildMenuItem(
+                  text: 'Moments',
+                  icon: Icons.light_mode_outlined,
+                  onTap: () => devtools.log('moments'),
+                ),
+                buildMenuItem(
+                  text: 'Monetisation',
+                  icon: Icons.money_rounded,
+                  onTap: () => devtools.log('monetisation'),
+                ),
+                const Divider(),
+                buildMenuItem(
+                  text: 'Twitter for Professionals',
+                  icon: Icons.rocket,
+                  onTap: () => devtools.log('Twitter for professionals'),
+                ),
+                const Divider(),
+                GestureDetector(
+                  onTap: () => devtools.log('settings and privacy'),
+                  child: const ListTile(
+                    visualDensity: VisualDensity(horizontal: -2, vertical: -4),
+                    leading: Text('Setting and privacy'),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    await AuthMethod().logoutUser();
+                    Navigator.pushReplacementNamed(
+                        context, MainLoginScreen.routeName);
+                  },
+                  child: const ListTile(
+                    visualDensity: VisualDensity(horizontal: -2, vertical: -4),
+                    leading: Text('Help Centre'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     ));
   }

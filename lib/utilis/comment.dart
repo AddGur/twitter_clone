@@ -1,9 +1,12 @@
+// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Comment {
   final String profImage;
   final String uid;
   final String username;
+  final String alias;
   final String text;
   final String commentId;
   final datePublished;
@@ -12,6 +15,7 @@ class Comment {
     required this.profImage,
     required this.uid,
     required this.username,
+    required this.alias,
     required this.text,
     required this.commentId,
     required this.datePublished,
@@ -24,6 +28,7 @@ class Comment {
       profImage: snapshot["profImage"],
       uid: snapshot["uid"],
       username: snapshot["username"],
+      alias: snapshot["alias"],
       text: snapshot["text"],
       commentId: snapshot["commentId"],
       datePublished: snapshot["datePublished"],
@@ -34,12 +39,9 @@ class Comment {
         "profImage": profImage,
         "uid": uid,
         "username": username,
+        "alias": alias,
         "text": text,
         "commentId": commentId,
         "datePublished": datePublished,
       };
-
-  //   Post findById(String id) {
-  // return FirebaseFirestore.instance.collection('posts').where().
-
 }

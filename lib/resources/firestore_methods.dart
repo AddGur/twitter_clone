@@ -1,13 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:twitter_clone/resources/storage_methods.dart';
 import 'package:twitter_clone/utilis/comment.dart';
 import 'package:twitter_clone/utilis/posts.dart';
-import 'package:twitter_clone/widgets/snackbar.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
 
@@ -56,7 +51,7 @@ class FirestoreMethods {
   }
 
   Future<String> postComment(String postId, String text, String uid,
-      String username, String profImage) async {
+      String username, String profImage, String alias) async {
     String res = 'Some error occured';
 
     try {
@@ -66,6 +61,7 @@ class FirestoreMethods {
           profImage: profImage,
           uid: uid,
           username: username,
+          alias: alias,
           text: text,
           commentId: commentId,
           datePublished: DateTime.now());
@@ -79,6 +75,14 @@ class FirestoreMethods {
       res = e.toString();
     }
     return res;
+  }
+
+  Future<void> deletePost(String postId) async {
+    try {
+      await _firestore.collection('posts').doc(postId).delete();
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   Future<String> getPublishedDate(dynamic snapshot, bool isTweet) async {
@@ -105,5 +109,48 @@ class FirestoreMethods {
       }
     }
     return formatted;
+  }
+
+  Future<void> likePost(String postId, String uid, List likes) async {
+    try {
+      if (likes.contains(uid)) {
+        await _firestore.collection('posts').doc(postId).update({
+          'likes': FieldValue.arrayRemove([uid]),
+        });
+      } else {
+        await _firestore.collection('posts').doc(postId).update({
+          'likes': FieldValue.arrayUnion([uid]),
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> followUser(String uid, String followId) async {
+    try {
+      DocumentSnapshot snapshot =
+          await _firestore.collection('users').doc(uid).get();
+      List following = (snapshot.data()! as dynamic)['following'];
+      if (following.contains(followId)) {
+        await _firestore.collection('users').doc(followId).update({
+          'followers': FieldValue.arrayRemove([uid]),
+        });
+
+        await _firestore.collection('users').doc(uid).update({
+          'following': FieldValue.arrayRemove([followId]),
+        });
+      } else {
+        await _firestore.collection('users').doc(followId).update({
+          'followers': FieldValue.arrayUnion([uid]),
+        });
+
+        await _firestore.collection('users').doc(uid).update({
+          'following': FieldValue.arrayUnion([followId]),
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
   }
 }

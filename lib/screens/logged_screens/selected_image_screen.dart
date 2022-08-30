@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import, no_leading_underscores_for_local_identifiers
+
 import 'dart:ui';
 
 import 'package:card_swiper/card_swiper.dart';
@@ -5,11 +7,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import 'package:provider/provider.dart';
 import 'package:palette_generator/palette_generator.dart';
-import 'package:swipe/swipe.dart';
 import 'package:twitter_clone/resources/firestore_methods.dart';
 import 'package:twitter_clone/widgets/post_widget.dart';
 import 'package:twitter_clone/widgets/social_bar_widget.dart';
@@ -29,17 +27,15 @@ class _SelectedImageScreenState extends State<SelectedImageScreen> {
   bool isBarHidden = false;
   List<String> imgUrl = [];
   List<PaletteColor> colors = [];
-  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final imgData = ModalRoute.of(context)!.settings.arguments as PassArguments;
-    final postId = imgData.postId;
 
     PageController controller = PageController(initialPage: imgData.index);
 
     Future<List<PaletteColor>> _updatePalettes() async {
-      await FirestoreMethods().getImgUrl(imgUrl, postId);
+      await FirestoreMethods().getImgUrl(imgUrl, imgData.snapshot['postId']);
       for (String image in imgUrl) {
         final PaletteGenerator generator =
             await PaletteGenerator.fromImageProvider(
@@ -71,7 +67,6 @@ class _SelectedImageScreenState extends State<SelectedImageScreen> {
                 controller: controller,
                 itemCount: imgUrl.length,
                 itemBuilder: (context, index) {
-                  _currentIndex = index;
                   return Scaffold(
                     appBar: AppBar(
                       systemOverlayStyle: SystemUiOverlayStyle(
@@ -80,13 +75,13 @@ class _SelectedImageScreenState extends State<SelectedImageScreen> {
                             : Colors.white,
                       ),
                       leading: IconButton(
-                        icon: Icon(Icons.arrow_back),
+                        icon: const Icon(Icons.arrow_back),
                         onPressed: () => Navigator.pop(context),
                       ),
                       actions: [
                         PopupMenuButton(
                             itemBuilder: (context) =>
-                                [PopupMenuItem(child: Text('Save'))])
+                                [const PopupMenuItem(child: Text('Save'))])
                       ],
                       backgroundColor: colors.isNotEmpty
                           ? colors[index].color
@@ -96,7 +91,7 @@ class _SelectedImageScreenState extends State<SelectedImageScreen> {
                     backgroundColor:
                         colors.isNotEmpty ? colors[index].color : Colors.white,
                     body: SingleChildScrollView(
-                      child: Container(
+                      child: SizedBox(
                         height: MediaQuery.of(context).size.height -
                             AppBar().preferredSize.height -
                             50,
@@ -125,15 +120,16 @@ class _SelectedImageScreenState extends State<SelectedImageScreen> {
                               child: Container(),
                             ),
                             Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
                               child: SocialBarWidget(
-                                postId: postId,
+                                snap: imgData.snapshot,
                                 color: Colors.white,
                                 isPostScreen: false,
                                 isTweetScreen: false,
                               ),
                             ),
-                            CommentWidget(postId: postId),
+                            CommentWidget(postId: imgData.snapshot['postId']),
                           ],
                         ),
                       ),

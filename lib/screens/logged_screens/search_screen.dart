@@ -56,8 +56,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   );
                 }),
               ),
-              actions: [
-                const Padding(
+              actions: const [
+                Padding(
                   padding: EdgeInsets.only(right: 10),
                   child: Icon(
                     Icons.settings,

@@ -1,16 +1,13 @@
+// ignore_for_file: unused_import, prefer_typing_uninitialized_variables, prefer_const_constructors
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:twitter_clone/resources/firestore_methods.dart';
 import 'package:twitter_clone/screens/logged_screens/profile_screen.dart';
-import 'package:twitter_clone/utilis/user.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:twitter_clone/widgets/bottom_sheet_widget.dart';
 import 'package:twitter_clone/widgets/img_post_grid_widget.dart';
 import 'package:twitter_clone/widgets/social_bar_widget.dart';
 
-import '../providers/user_provider.dart';
-import '../screens/logged_screens/selected_image_screen.dart';
 import 'dart:developer' as devtools show log;
 
 import '../screens/logged_screens/tweet_screen.dart';
@@ -28,6 +25,7 @@ class PostWidget extends StatefulWidget {
 
 class _PostWidgetState extends State<PostWidget> {
   int length = 0;
+  bool isLikeAnimating = false;
 
   @override
   void initState() {
@@ -94,11 +92,10 @@ class _PostWidgetState extends State<PostWidget> {
                                         fontWeight: FontWeight.w400,
                                         color: Colors.grey[700]),
                                   ),
+                                  TwitterBottomSheet(
+                                    snap: widget.snap,
+                                  )
                                 ],
-                              ),
-                              const Icon(
-                                Icons.list,
-                                size: 16,
                               ),
                             ],
                           ),
@@ -107,11 +104,11 @@ class _PostWidgetState extends State<PostWidget> {
                           ),
                           if (widget.snap['postUrl'] != null)
                             ImgPostGridWidget(
-                                length: widget.snap['postUrl'].length,
-                                postId: widget.snap['postId'],
-                                postUrl: widget.snap['postUrl']),
+                              length: widget.snap['postUrl'].length,
+                              snap: widget.snap,
+                            ),
                           SocialBarWidget(
-                            postId: widget.snap['postId'],
+                            snap: widget.snap,
                             color: Colors.grey[600]!,
                             isPostScreen: true,
                             isTweetScreen: false,
@@ -130,8 +127,8 @@ class _PostWidgetState extends State<PostWidget> {
 }
 
 class PassArguments {
-  final String postId;
+  final dynamic snapshot;
   final int index;
 
-  PassArguments(this.postId, this.index);
+  PassArguments(this.snapshot, this.index);
 }

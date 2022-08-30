@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, unused_local_variable, unused_import
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:twitter_clone/screens/login_screens/enter_password_screen.dart';
@@ -46,11 +48,11 @@ class _LoginScreenState extends State<LoginScreen> {
         .where(dataType, isEqualTo: _loginController.text)
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         setState(() {
           isContains = true;
         });
-      });
+      }
     });
   }
 
@@ -97,13 +99,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             TextField(
               controller: _loginController,
               decoration: const InputDecoration(
-                  border: const OutlineInputBorder(),
+                  border: OutlineInputBorder(),
                   labelText: 'Phone, email address or username'),
             ),
             const Expanded(

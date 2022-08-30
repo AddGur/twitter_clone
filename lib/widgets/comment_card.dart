@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
 import 'package:flutter/material.dart';
+import 'package:twitter_clone/widgets/bottom_sheet_widget.dart';
 import '../resources/firestore_methods.dart';
 import '../screens/logged_screens/profile_screen.dart';
 
@@ -73,11 +74,8 @@ class _CommentCardState extends State<CommentCard> {
                                       fontWeight: FontWeight.w400,
                                       color: Colors.grey[700]),
                                 ),
+                                TwitterBottomSheet(snap: widget.snap),
                               ],
-                            ),
-                            const Icon(
-                              Icons.list,
-                              size: 16,
                             ),
                           ],
                         ),

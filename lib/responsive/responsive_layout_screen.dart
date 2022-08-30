@@ -30,9 +30,9 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
     setState(() {
       isLoading = true;
     });
-    UserProvider _userProvider =
+    UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: false);
-    await _userProvider.refreshUser();
+    await userProvider.refreshUser();
     setState(() {
       isLoading = false;
     });
@@ -41,7 +41,7 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? Center(child: CircularProgressIndicator())
+        ? const Center(child: CircularProgressIndicator())
         : LayoutBuilder(builder: (context, constraints) {
             return widget.mobileScreenLayout;
           });

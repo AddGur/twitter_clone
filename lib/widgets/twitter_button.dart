@@ -18,7 +18,7 @@ class TwitterButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
-          side: BorderSide(
+          side: const BorderSide(
             width: 1.0,
             color: Colors.grey,
           ),

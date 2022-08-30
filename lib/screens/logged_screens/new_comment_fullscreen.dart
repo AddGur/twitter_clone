@@ -1,7 +1,7 @@
+// ignore_for_file: avoid_print, prefer_typing_uninitialized_variables, unused_import
+
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:developer' as devtools show log;
-import 'dart:io';
 
 import 'package:provider/provider.dart';
 import 'package:twitter_clone/resources/firestore_methods.dart';
@@ -33,10 +33,10 @@ class _NewCommentFullScreenState extends State<NewCommentFullScreen> {
   }
 
   void postComment(String profilePic, String uid, String username, String text,
-      String postId) async {
+      String postId, String alias) async {
     try {
       String res = await FirestoreMethods()
-          .postComment(postId, text, uid, username, profilePic);
+          .postComment(postId, text, uid, username, profilePic, alias);
 
       if (res == 'success') {
         showDialog(
@@ -51,6 +51,7 @@ class _NewCommentFullScreenState extends State<NewCommentFullScreen> {
               return AlertDialog(
                 elevation: 0,
                 title: Row(
+                  // ignore: prefer_const_literals_to_create_immutables
                   children: [
                     const Icon(
                       Icons.check_circle_rounded,
@@ -72,7 +73,7 @@ class _NewCommentFullScreenState extends State<NewCommentFullScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final model.User _user = Provider.of<UserProvider>(context).getUser;
+    final model.User user = Provider.of<UserProvider>(context).getUser;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -90,17 +91,17 @@ class _NewCommentFullScreenState extends State<NewCommentFullScreen> {
           actions: [
             ElevatedButton(
               onPressed: () async {
-                postComment(_user.photoUrl!, _user.uid, _user.username,
-                    _commentController.text, widget.postId);
+                postComment(user.photoUrl!, user.uid, user.username,
+                    _commentController.text, widget.postId, user.alias);
                 _commentController.clear();
                 Navigator.pop(context);
               },
-              child: const Text('Reply'),
               style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20))),
+              child: const Text('Reply'),
             ),
             const SizedBox(
               width: 10,
@@ -116,10 +117,10 @@ class _NewCommentFullScreenState extends State<NewCommentFullScreen> {
               child:
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Padding(
-                  padding: EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.only(top: 8),
                   child: CircleAvatar(
                     radius: 15,
-                    backgroundImage: NetworkImage(_user.photoUrl!),
+                    backgroundImage: NetworkImage(user.photoUrl!),
                     backgroundColor: Colors.red,
                   ),
                 ),
@@ -134,7 +135,7 @@ class _NewCommentFullScreenState extends State<NewCommentFullScreen> {
                         onChanged: (value) {},
                         autofocus: true,
                         maxLines: null,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Tweet your reply',
                           border: InputBorder.none,
                         ),

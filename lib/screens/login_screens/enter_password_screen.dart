@@ -1,17 +1,13 @@
+// ignore_for_file: use_build_context_synchronously, unused_import
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:twitter_clone/resources/auth_method.dart';
 import 'package:twitter_clone/responsive/responsive_layout_screen.dart';
-
-import '../../../utilis/user.dart';
-
 import '../../../widgets/twitter_button.dart';
 
 import 'dart:developer' as devtools show log;
 
-import '../../providers/user_provider.dart';
 import '../../responsive/mobile_screen_layout.dart';
 import '../../widgets/snackbar.dart';
 
@@ -36,13 +32,6 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
 
     _password = TextEditingController();
   }
-
-  // addData() async {
-  //   UserProvider _userProvider =
-  //       Provider.of<UserProvider>(context, listen: false);
-  //   await _userProvider.refreshUser();
-  //   Navigator.pushNamed(context, MobileScreenLayout.routeName);
-  // }
 
   @override
   void dispose() {
@@ -72,11 +61,11 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
         .where(dataType, isEqualTo: input)
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         setState(() {
           email = doc['email'];
         });
-      });
+      }
     });
   }
 
@@ -137,7 +126,7 @@ class _EnterPasswordScreenState extends State<EnterPasswordScreen> {
                   autocorrect: false,
                   autofocus: true,
                   onChanged: (value) {
-                    if (value.length > 0) {
+                    if (value.isNotEmpty) {
                       setState(() {
                         isPasswordEmpty = false;
                       });

@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'dart:typed_data';
 
 import 'package:dotted_border/dotted_border.dart';
@@ -7,10 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:twitter_clone/screens/signin_screens/add_description_screen.dart';
 import 'package:twitter_clone/utilis/user.dart';
-
-import '../../resources/storage_methods.dart';
 import '../../widgets/twitter_button.dart';
-import '../main_screen.dart';
 
 import 'dart:developer' as devtools show log;
 
@@ -25,12 +24,10 @@ class AddProfilePictureScreen extends StatefulWidget {
 
 class _AddProfilePictureScreenState extends State<AddProfilePictureScreen> {
   bool _isImagePicked = false;
-
   Uint8List? _file;
 
   @override
   Widget build(BuildContext context) {
-    final userData = Provider.of<NewUser>(context);
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -45,20 +42,20 @@ class _AddProfilePictureScreenState extends State<AddProfilePictureScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Flexible(
+              const Flexible(
                 child: Text(
                   'Pick a profile picture',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
-              Text(
+              const Text(
                 'Have a favourite selfie? Upload it now.',
                 style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 40,
               ),
               Row(
@@ -73,16 +70,16 @@ class _AddProfilePictureScreenState extends State<AddProfilePictureScreen> {
                           )
                         : DottedBorder(
                             color: Colors.blue,
-                            dashPattern: [10],
+                            dashPattern: const [10],
                             borderType: BorderType.RRect,
-                            radius: Radius.circular(15),
+                            radius: const Radius.circular(15),
                             strokeCap: StrokeCap.round,
                             strokeWidth: 2,
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 30, vertical: 15),
                               child: Column(
-                                children: [
+                                children: const [
                                   Icon(
                                     Icons.photo_camera,
                                     color: Colors.blue,
@@ -100,7 +97,7 @@ class _AddProfilePictureScreenState extends State<AddProfilePictureScreen> {
                 ],
               ),
               Expanded(flex: 10, child: Container()),
-              Divider(),
+              const Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -129,10 +126,10 @@ class _AddProfilePictureScreenState extends State<AddProfilePictureScreen> {
   }
 
   pickImage(ImageSource source) async {
-    final ImagePicker _imagePicker = ImagePicker();
-    XFile? _file = await _imagePicker.pickImage(source: source, maxWidth: 600);
-    if (_file != null) {
-      return await _file.readAsBytes();
+    final ImagePicker imagePicker = ImagePicker();
+    XFile? file = await imagePicker.pickImage(source: source, maxWidth: 600);
+    if (file != null) {
+      return await file.readAsBytes();
     }
   }
 

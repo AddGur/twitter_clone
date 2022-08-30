@@ -1,14 +1,14 @@
+// ignore_for_file: unused_import
+
 import 'package:file/file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
 
 import '../../../utilis/user.dart';
 import '../../../widgets/twitter_button.dart';
 
 import 'dart:developer' as devtools show log;
-
 import 'add_alias_screen.dart';
 
 class AddDescriptionScreen extends StatefulWidget {

@@ -1,14 +1,12 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:email_auth/email_auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:twitter_clone/screens/signin_screens/add_email_adress_screen.dart';
 import 'package:twitter_clone/screens/signin_screens/add_password_screen.dart';
-
 import '../../utilis/user.dart';
 import '../../widgets/twitter_button.dart';
 import '../main_screen.dart';
@@ -99,9 +97,9 @@ class _AddFirstDataScreenState extends State<AddFirstDataScreen> {
         .get()
         .then((QuerySnapshot querySnapshot) {
       _isEmailExists = false;
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         _isEmailExists = true;
-      });
+      }
     });
   }
 
@@ -140,7 +138,7 @@ class _AddFirstDataScreenState extends State<AddFirstDataScreen> {
                           TextStyle(fontSize: 25, fontWeight: FontWeight.w700),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   TextField(
@@ -159,7 +157,7 @@ class _AddFirstDataScreenState extends State<AddFirstDataScreen> {
                     },
                     controller: _nameController,
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                       suffixIcon: nameLength == 0
                           ? null
                           : _isNameCorrect
@@ -190,7 +188,7 @@ class _AddFirstDataScreenState extends State<AddFirstDataScreen> {
                       });
                     },
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   TextField(
@@ -280,7 +278,7 @@ class _AddFirstDataScreenState extends State<AddFirstDataScreen> {
                       ),
                       controller:
                           _emailChoosen ? _numberController : _emailController),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   GestureDetector(
@@ -300,7 +298,7 @@ class _AddFirstDataScreenState extends State<AddFirstDataScreen> {
                       ),
                     ),
                   ),
-                  Expanded(child: SizedBox()),
+                  const Expanded(child: SizedBox()),
                   const Divider(),
                   Row(
                     mainAxisAlignment: _isFocusedEmailPhone

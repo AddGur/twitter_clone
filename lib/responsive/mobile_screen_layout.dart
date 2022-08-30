@@ -1,8 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../providers/user_provider.dart';
 import '../utilis/global_variables.dart';
 
 class MobileScreenLayout extends StatefulWidget {

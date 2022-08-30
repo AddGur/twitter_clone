@@ -1,7 +1,8 @@
+// ignore_for_file: prefer_typing_uninitialized_variables, unused_local_variable
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
-import 'package:uuid/uuid.dart';
 import 'dart:io';
 
 class StorageMethods {
@@ -21,18 +22,18 @@ class StorageMethods {
 
   Future<ListResult> listFiles() async {
     ListResult results = await _storage.ref('test').listAll();
-    results.items.forEach((Reference ref) {});
+    for (var ref in results.items) {}
     return results;
   }
 
-  Future<List<String>> postImages(List<File> _images, String postId) async {
+  Future<List<String>> postImages(List<File> images, String postId) async {
     var imageUrls =
-        await Future.wait(_images.map((_image) => imageToPost(_image, postId)));
+        await Future.wait(images.map((image) => imageToPost(image, postId)));
 
     return imageUrls;
   }
 
-  Future<String> imageToPost(File _image, String postId) async {
+  Future<String> imageToPost(File image, String postId) async {
     var downloadUrl;
 
     Reference reference = FirebaseStorage.instance
@@ -40,11 +41,11 @@ class StorageMethods {
         .child('posts')
         .child(_auth.currentUser!.uid)
         .child(postId)
-        .child(_image
+        .child(image
             .toString()
             .replaceAll('/data/user/0/com.example.twitter_clone/cache/', ''));
 
-    UploadTask uploadTask = reference.putFile(_image);
+    UploadTask uploadTask = reference.putFile(image);
     await uploadTask.whenComplete(() async {
       downloadUrl = await reference.getDownloadURL();
     });

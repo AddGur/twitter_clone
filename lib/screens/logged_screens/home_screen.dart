@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,13 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:twitter_clone/resources/auth_method.dart';
-import 'package:twitter_clone/screens/logged_screens/tweet_screen.dart';
 
 import '../../providers/user_provider.dart';
 import '../../utilis/user.dart' as model;
 import '../logged_screens/new_post_screen.dart';
-import '../logged_screens/selected_image_screen.dart';
 import 'package:twitter_clone/widgets/drawer.dart';
 import 'package:twitter_clone/widgets/post_widget.dart';
 
@@ -52,8 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
               return CustomScrollView(
                 slivers: [
                   SliverAppBar(
-                    systemOverlayStyle:
-                        SystemUiOverlayStyle(statusBarColor: Colors.white),
+                    systemOverlayStyle: const SystemUiOverlayStyle(
+                        statusBarColor: Colors.white),
                     backgroundColor: Colors.white,
                     floating: true,
                     expandedHeight: 30.0,
@@ -69,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: CircleAvatar(
                             backgroundColor: Colors.transparent,
                             backgroundImage: user.photoUrl!.isEmpty
-                                ? NetworkImage(
+                                ? const NetworkImage(
                                     'https://cdn.iconscout.com/icon/premium/png-256-thumb/profile-3891967-3227614.png')
                                 : NetworkImage(user.photoUrl!),
                           ),
@@ -91,9 +86,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       (BuildContext context, int index) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return CircularProgressIndicator();
+                          return const CircularProgressIndicator();
                         }
-                        return snapshot.data!.docs.length > 0
+                        return snapshot.data!.docs.isNotEmpty
                             ? PostWidget(
                                 snap: snapshot.data!.docs[index].data())
                             : const Center(

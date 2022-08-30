@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, use_build_context_synchronously, unused_import, prefer_typing_uninitialized_variables
+
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,12 +40,12 @@ class _AddAliasScreenState extends State<AddAliasScreen> {
 
     super.initState();
     _alias = TextEditingController();
-    randName = ('${userData.name}${randNumb}');
+    randName = ('${userData.name}$randNumb');
     _alias.text = randName;
     getFireData();
     if (_aliasExists) {
       randNumb++;
-      randName = ('${userData.name}${randNumb}');
+      randName = ('${userData.name}$randNumb');
       _alias.text = randName;
     }
   }
@@ -71,15 +73,14 @@ class _AddAliasScreenState extends State<AddAliasScreen> {
       showSnackBar('err', context, 30);
     } else {
       await addData();
-
       await Navigator.pushNamed(context, MobileScreenLayout.routeName);
     }
   }
 
   addData() async {
-    UserProvider _userProvider =
+    UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: false);
-    await _userProvider.refreshUser();
+    await userProvider.refreshUser();
   }
 
   Future getFireData() async {
@@ -90,9 +91,9 @@ class _AddAliasScreenState extends State<AddAliasScreen> {
         .then((QuerySnapshot querySnapshot) {
       _aliasExists = false;
 
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         _aliasExists = true;
-      });
+      }
     });
   }
 

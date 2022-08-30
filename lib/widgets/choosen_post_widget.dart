@@ -84,9 +84,7 @@ class _ChoosenPostWidgetState extends State<ChoosenPostWidget> {
                 ),
                 if (widget.snap['postUrl'] != null)
                   ImgPostGridWidget(
-                      length: widget.snap['postUrl'].length,
-                      postId: widget.snap['postId'],
-                      postUrl: widget.snap['postUrl']),
+                      length: widget.snap['postUrl'].length, snap: widget.snap),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: SizedBox(
@@ -106,7 +104,7 @@ class _ChoosenPostWidgetState extends State<ChoosenPostWidget> {
                 ),
                 const Divider(),
                 SocialBarWidget(
-                  postId: widget.snap['postId'],
+                  snap: widget.snap,
                   color: Colors.grey[600]!,
                   isPostScreen: false,
                   isTweetScreen: true,
